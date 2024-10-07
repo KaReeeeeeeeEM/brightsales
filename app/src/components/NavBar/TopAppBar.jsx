@@ -44,15 +44,44 @@ function TopAppBar({ theme, toggleTheme }) {
               Theme
             </span>
             <span className={`w-full flex items-center justify-between mb-4 ${!toggleProfile && 'hidden'}`}>
-              <span onClick={() => handleThemeChange('light')} className={`w-1/4 text-sm cursor-pointer ${theme === 'light' &&localStorage.getItem('theme') &&  !localStorage.getItem('theme').includes('system') ? 'bg-primary-light text-primary-dark' : ''} hover:bg-primary-light hover:text-primary-dark transition ease-in-out duration-700 flex items-center justify-center h-8 bg-accent-darkGray rounded-lg`}>
+            <span 
+                onClick={() => handleThemeChange('light')} 
+                className={`w-1/4 text-sm cursor-pointer ${
+                  theme === 'light' &&
+                  localStorage.getItem('theme') &&
+                  !localStorage.getItem('theme')?.includes('system') // Safely handle potential null value
+                    ? 'bg-primary-light text-primary-dark'
+                    : ''
+                } hover:bg-primary-light hover:text-primary-dark transition ease-in-out duration-700 flex items-center justify-center h-8 bg-accent-darkGray rounded-lg`}
+              >
                 <FaSun />
               </span>
-              <span onClick={() => handleThemeChange('dark')} className={`w-1/4 text-sm cursor-pointer ${theme === 'dark' &&localStorage.getItem('theme') &&  !localStorage.getItem('theme').includes('system') ? 'bg-primary-light text-primary-dark' : ''} hover:bg-primary-light hover:text-primary-dark transition ease-in-out duration-700 flex items-center justify-center h-8 bg-accent-darkGray rounded-lg`}>
+
+              <span 
+                onClick={() => handleThemeChange('dark')} 
+                className={`w-1/4 text-sm cursor-pointer ${
+                  theme === 'dark' &&
+                  localStorage.getItem('theme') &&
+                  !localStorage.getItem('theme')?.includes('system') // Safely handle potential null value
+                    ? 'bg-primary-light text-primary-dark'
+                    : ''
+                } hover:bg-primary-light hover:text-primary-dark transition ease-in-out duration-700 flex items-center justify-center h-8 bg-accent-darkGray rounded-lg`}
+              >
                 <FaMoon />
               </span>
-              <span onClick={() => handleThemeChange('system')} className={`w-1/4 text-sm cursor-pointer ${localStorage.getItem('theme') && localStorage.getItem('theme').includes('system')? 'bg-primary-light text-primary-dark' : ''} hover:bg-primary-light hover:text-primary-dark transition ease-in-out duration-700 flex items-center justify-center h-8 bg-accent-darkGray rounded-lg`}>
+
+              <span 
+                onClick={() => handleThemeChange('system')} 
+                className={`w-1/4 text-sm cursor-pointer ${
+                  localStorage.getItem('theme') &&
+                  localStorage.getItem('theme')?.includes('system') // Safely handle potential null value
+                    ? 'bg-primary-light text-primary-dark'
+                    : ''
+                } hover:bg-primary-light hover:text-primary-dark transition ease-in-out duration-700 flex items-center justify-center h-8 bg-accent-darkGray rounded-lg`}
+              >
                 <FaLaptop />
               </span>
+
             </span>
 
             <button className={`mt-2 text-sm w-full dark:bg-primary-dark hover:bg-[#2f2f2f] ${!toggleProfile && 'hidden'}`}>
