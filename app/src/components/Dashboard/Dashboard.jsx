@@ -16,7 +16,7 @@ export default function Dashboard() {
           </div>  
 
           {/* content */}
-          <div className={`${isCollapsed ? 'md:w-[90%] lg:w-[95%]' : 'w-[85%] md:w-[75%] lg:w-[80%]'} pt-16 md:pt-20 px-2 md:px-4 lg:px-6 h-screen transition-all ease-in-out duration-700`}>
+          <div className={`${isCollapsed ? 'w-[85%] md:w-[90%] lg:w-[95%]' : 'w-[85%] md:w-[75%] lg:w-[80%]'} pt-16 md:pt-20 px-2 md:px-4 lg:px-6 h-screen transition-all ease-in-out duration-700`}>
               {selected === 'Dashboard' && <DashboardContent />}
           </div>
       </div>

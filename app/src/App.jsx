@@ -8,11 +8,11 @@ function App() {
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
 
-    if (savedTheme.includes('system')) {
+    if (savedTheme && savedTheme.includes('system')) {
       const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const systemTheme = prefersDarkScheme ? 'dark' : 'light';
-      setTheme(savedTheme);
-      document.documentElement.classList.add(systemTheme);
+      const systemTheme = prefersDarkScheme ? 'system-dark' : 'system-light';
+      setTheme(systemTheme);
+      document.documentElement.classList.add(prefersDarkScheme ? 'dark' : 'light');
     } else if (savedTheme) {
       setTheme(savedTheme);
       document.documentElement.classList.add(savedTheme);
@@ -22,12 +22,24 @@ function App() {
     }
   }, []);
 
-  const toggleTheme = (system) => {
-    const newTheme = system ? system : theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme.includes('system') ? newTheme.split('-')[1] : newTheme);
-    document.documentElement.classList.remove(theme);
+  const toggleTheme = (selectedTheme) => {
+    let newTheme = selectedTheme;
+
+    if (selectedTheme === 'system') {
+      const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      newTheme = prefersDarkScheme ? 'system-dark' : 'system-light';
+    }
+
+    setTheme(newTheme);
+
+    // Remove the previously applied theme classes
+    document.documentElement.classList.remove('light', 'dark');
+
+    // Add the new theme class
     document.documentElement.classList.add(newTheme.includes('system') ? newTheme.split('-')[1] : newTheme);
-    localStorage.setItem('theme', newTheme);
+
+    // Save the new theme to localStorage
+    localStorage.setItem('theme', selectedTheme);
   };
 
   return (
