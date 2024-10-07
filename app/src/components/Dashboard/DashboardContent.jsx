@@ -206,7 +206,7 @@ function DashboardContent() {
             <div className='relative flex items-center justify-center p-2 mt-2 w-full md:w-[49%] lg:w-[34%] h-[35vh] md:h-[30vh] lg:h-[40vh] bg-primary-dark dark:bg-[#2f2f2f] rounded-lg'>
                 <Doughnut data={doughnutData} options={doughnutOptions} />
                 <span className='absolute flex flex-col items-center justify-center mx-auto mt-16 w-16 h-16'>
-                    <span className={`text-sm ${score < 5 ? 'text-red-600' : (score === 5 ? 'text-orange-600' : 'text-green-600')}`}>
+                    <span className={`text-sm font-bold ${score < 5 ? 'text-red-600' : (score === 5 ? 'text-orange-600' : 'text-green-600')}`}>
                         {score < 5 ? 'Weak' : (score === 5? 'Balanced' : 'Good')}
                     </span>
                     <span className='text-primary-light text-lg font-bold'>
