@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useState } from 'react'
-import { FaExpandAlt, FaExpand, FaTachometerAlt, FaChartBar, FaFileAlt, FaBoxOpen } from 'react-icons/fa'
+import { FaExpandAlt, FaExpand, FaTachometerAlt, FaChartBar, FaFileAlt, FaBoxOpen, FaCoins } from 'react-icons/fa'
 
 function SideNav({isCollapsed,setIsCollapsed,selected,setSelected}) {
     
@@ -25,6 +25,13 @@ function SideNav({isCollapsed,setIsCollapsed,selected,setSelected}) {
                     <FaBoxOpen className={`text-sm md:text-md lg:text-lg ${!isCollapsed ? 'md:mr-2' : ''}`} />
                     <span className='hidden md:block'> {!isCollapsed ? 'Stock Manager' : ''} </span>
                 
+                </span>
+            </span>
+
+            <span className='mt-4'>
+                <span onClick={() => setSelected('Expenses')} className={`flex items-center cursor-pointer ${!isCollapsed ? 'justify-start' : 'justify-center'} px-4 py-2 text-sm ${selected === 'Expenses'? 'bg-[#2f2f2f] text-primary-light' : '' } hover:bg-[#2f2f2f] hover:text-accent-gray transition-all ease-in-out duration-700 rounded`}>
+                    <FaCoins className={`text-sm md:text-md lg:text-lg ${!isCollapsed ? 'md:mr-2' : ''}`} />
+                    <span className='hidden md:block'> {!isCollapsed ? 'Expense Tracker' : ''} </span>
                 </span>
             </span>
 

@@ -1,6 +1,10 @@
 import { useState } from "react";
 import SideNav from "../NavBar/SideNav";
 import DashboardContent from "./DashboardContent";
+import StockManager from "../StockManager/StockManager";
+import ExpenseTracker from "../ExpenseTracker/ExpenseTracker";
+import Sales from "../Sales/Sales";
+import BusinessSummary from "../BusinessSummary/BusinessSummary";
 
 export default function Dashboard() {
   const [isCollapsed, setIsCollapsed] = useState(true);
@@ -18,6 +22,10 @@ export default function Dashboard() {
           {/* content */}
           <div className={`${isCollapsed ? 'w-[85%] md:w-[90%] lg:w-[95%]' : 'w-[85%] md:w-[75%] lg:w-[80%]'} pt-16 md:pt-20 px-2 md:px-4 lg:px-6 h-screen transition-all ease-in-out duration-700`}>
               {selected === 'Dashboard' && <DashboardContent />}
+              {selected === 'Stock' && <StockManager />}
+              {selected === 'Expenses' && <ExpenseTracker />}
+              {selected === 'Sales' && <Sales />}
+              {selected === 'Summary' && <BusinessSummary />}
           </div>
       </div>
     );

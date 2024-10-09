@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaBoxOpen, FaChartBar, FaChartLine, FaCoins } from "react-icons/fa";
+import { FaBoxOpen, FaChartBar, FaChartLine, FaCoins, FaTachometerAlt } from "react-icons/fa";
 import { Line } from "react-chartjs-2";
 import { Doughnut } from "react-chartjs-2";
 import {
@@ -162,14 +162,15 @@ function DashboardContent() {
 
   return (
     <div className="w-full flex flex-col items-start justify-start h-auto">
-      <span className="mt-2 md:mt-0 text-primary-dark dark:text-primary-light font-bold text-lg md:text-xl lg:text-2xl">
+      <span className="mt-2 md:mt-0 flex items-center text-primary-dark dark:text-primary-light font-bold text-lg md:text-xl lg:text-2xl">
+        <FaTachometerAlt className="mr-2" />
         Dashboard
       </span>
 
       {/* cards */}
       <div className="mt-2 md:mt-8 w-full flex flex-col md:flex-row md:flex-wrap items-center justify-between">
         {/* stock card */}
-        <div className="flex flex-col w-full md:w-[49%] lg:w-[24%] h-[18vh] md:h-[12vh] lg:h-[15vh] mt-2 md:mt-4 lg:mt-0 bg-primary-dark dark:bg-[#2f2f2f] p-2 rounded-lg group">
+        <div className="flex flex-col w-full md:w-[49%] lg:w-[24%] h-[8rem] md:h-[8rem] mt-2 md:mt-4 lg:mt-0 bg-primary-dark dark:bg-[#2f2f2f] p-2 rounded-lg group">
           <span className="flex items-center">
             <span className="relative w-8 h-8 group">
               <span className="absolute top-0 left-0 w-full h-full bg-[#2f2f2f] dark:bg-accent-darkGray rounded-full group-hover:bg-[#a1a1a1] transition ease-in-out duration-700"></span>
@@ -186,7 +187,7 @@ function DashboardContent() {
         </div>
 
         {/* total sales card */}
-        <div className="flex flex-col w-full md:w-[49%] lg:w-[24%] h-[18vh] md:h-[12vh] lg:h-[15vh] mt-2 md:mt-4 lg:mt-0 bg-primary-dark dark:bg-[#2f2f2f] p-2 rounded-lg group">
+        <div className="flex flex-col w-full md:w-[49%] lg:w-[24%] h-[8rem] md:h-[8rem] mt-2 md:mt-4 lg:mt-0 bg-primary-dark dark:bg-[#2f2f2f] p-2 rounded-lg group">
           <span className="flex items-center">
             <span className="relative w-8 h-8 group">
               <span className="absolute top-0 left-0 w-full h-full bg-[#2f2f2f] dark:bg-accent-darkGray rounded-full group-hover:bg-[#a1a1a1] transition ease-in-out duration-700"></span>
@@ -203,7 +204,7 @@ function DashboardContent() {
         </div>
 
         {/* weekly sales card */}
-        <div className="flex flex-col w-full md:w-[49%] lg:w-[24%] h-[18vh] md:h-[12vh] lg:h-[15vh] mt-2 md:mt-4 lg:mt-0 bg-primary-dark dark:bg-[#2f2f2f] p-2 rounded-lg group">
+        <div className="flex flex-col w-full md:w-[49%] lg:w-[24%] h-[8rem] md:h-[8rem] mt-2 md:mt-4 lg:mt-0 bg-primary-dark dark:bg-[#2f2f2f] p-2 rounded-lg group">
           <span className="flex items-center">
             <span className="relative w-8 h-8 group">
               <span className="absolute top-0 left-0 w-full h-full bg-[#2f2f2f] dark:bg-accent-darkGray rounded-full group-hover:bg-[#a1a1a1] transition ease-in-out duration-700"></span>
@@ -220,7 +221,7 @@ function DashboardContent() {
         </div>
 
         {/* total expenses */}
-        <div className="flex flex-col w-full md:w-[49%] lg:w-[24%] h-[18vh] md:h-[12vh] lg:h-[15vh] mt-2 md:mt-4 lg:mt-0 bg-primary-dark dark:bg-[#2f2f2f] p-2 rounded-lg group">
+        <div className="flex flex-col w-full md:w-[49%] lg:w-[24%] h-[8rem] md:h-[8rem] mt-2 md:mt-4 lg:mt-0 bg-primary-dark dark:bg-[#2f2f2f] p-2 rounded-lg group">
           <span className="flex items-center">
             <span className="relative w-8 h-8 group">
               <span className="absolute top-0 left-0 w-full h-full bg-[#2f2f2f] dark:bg-accent-darkGray rounded-full group-hover:bg-[#a1a1a1] transition ease-in-out duration-700"></span>
@@ -242,10 +243,10 @@ function DashboardContent() {
         Visualization
       </span>
       <div className=" w-full flex flex-col md:flex-row items-center justify-between">
-        <div className="flex items-center justify-center p-2 mt-2 w-full md:w-[49%] lg:w-[64%] h-[35vh] md:h-[30vh] lg:h-[40vh] bg-primary-dark dark:bg-[#2f2f2f] rounded-lg">
+        <div className="flex items-center justify-center p-2 mt-2 w-full md:w-[49%] lg:w-[64%] h-[35vh] md:h-[23rem] lg:h-[25rem] bg-primary-dark dark:bg-[#2f2f2f] rounded-lg">
           <Line data={lineData} options={lineOptions} />
         </div>
-        <div className="relative flex items-center justify-center p-2 mt-2 w-full md:w-[49%] lg:w-[34%] h-[35vh] md:h-[30vh] lg:h-[40vh] bg-primary-dark dark:bg-[#2f2f2f] rounded-lg">
+        <div className="relative flex items-center justify-center p-2 mt-2 w-full md:w-[49%] lg:w-[34%] h-[35vh] md:h-[23rem] lg:h-[25rem] bg-primary-dark dark:bg-[#2f2f2f] rounded-lg">
           <Doughnut data={doughnutData} options={doughnutOptions} />
           <span className="absolute flex flex-col items-center justify-center mx-auto mt-16 w-16 h-16">
             <span
@@ -270,7 +271,7 @@ function DashboardContent() {
       </span>
     
       {/* table */}
-      <div className="w-full mt-4 bg-primary-dark dark:bg-[#2f2f2f] py-8 px-4 rounded-lg">
+      <div className="w-full mt-4 mb-8 bg-primary-dark dark:bg-[#2f2f2f] py-8 px-4 rounded-lg">
         <div className="w-full overflow-x-auto">
           <table className="table-auto w-full border-collapse">
             <thead>
