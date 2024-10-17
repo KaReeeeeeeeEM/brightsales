@@ -11,7 +11,7 @@ export default function Dashboard() {
   const [selected, setSelected] = useState('Dashboard')
 
     return (
-      <div className="w-full h-screen overflow-y-auto flex items-start justify-end bg-primary-light dark:bg-primary-dark text-gray-900 dark:text-gray-100 transition-all ease-in-out duration-700">
+      <div className="w-full h-screen overflow-y-auto flex items-start justify-end bg-[#eee] dark:bg-primary-dark text-gray-900 dark:text-gray-100 transition-all ease-in-out duration-700">
         {/* side navigation bar */}
         <div
             className={`fixed left-0 top-0 bg-primary-dark 4 ${isCollapsed ? 'md:w-[10%] lg:w-[5%]' : 'w-[15%] md:w-[25%] lg:w-[20%]'} pt-16 h-screen transition-all ease-in-out duration-700`}       

@@ -23,7 +23,7 @@ function TopAppBar({ theme, toggleTheme }) {
           </span>
 
           {/* Profile block */}
-          <span className={`flex flex-col items-center justify-center transform ${toggleProfile ? 'w-48 md:w-60 lg:w-56 h-auto top-16 lg:top-20 right-2 opacity-1' : 'w-0 h-0 top-16 lg:top-20 right-2 opacity-0'} absolute bg-primary-dark dark:bg-[#2f2f2f] p-2 rounded-lg transition-all ease-in-out duration-700 shadow-xl z-10`}>
+          <span className={`flex flex-col items-center justify-center transform ${toggleProfile ? 'w-48 md:w-60 lg:w-56 h-auto top-16 lg:top-20 right-2 opacity-1' : 'w-0 h-0 top-16 lg:top-20 right-2 opacity-0'} absolute bg-primary-dark dark:bg-primary-glass p-2 rounded-lg transition-all ease-in-out duration-700 shadow-xl z-10`}>
             <span className={`w-12 h-12 border-2 border-accent-darkGray bg-accent-darkGray rounded-full ${!toggleProfile && 'hidden'}`}>
               <img src='/logo.png' alt='profile' className={`w-full h-full rounded-full object-cover ${!toggleProfile && 'hidden'}`} />
             </span>
@@ -31,7 +31,7 @@ function TopAppBar({ theme, toggleTheme }) {
               Kareem
             </span>
 
-            <hr className={`w-full my-2 rounded bg-[#2f2f2f] dark:bg-accent-darkGray ${!toggleProfile && 'hidden'}`} />
+            <hr className={`w-full my-2 rounded bg-primary-glass dark:bg-accent-darkGray ${!toggleProfile && 'hidden'}`} />
             <span className={`text-xs text-gray-300 mb-2 ${!toggleProfile && 'hidden'}`}>
               Theme
             </span>
@@ -58,7 +58,7 @@ function TopAppBar({ theme, toggleTheme }) {
               </span>
             </span>
 
-            <button className={`mt-2 text-sm w-full dark:bg-primary-dark hover:bg-[#2f2f2f] ${!toggleProfile && 'hidden'}`}>
+            <button className={`mt-2 text-sm w-full dark:bg-primary-dark hover:bg-primary-glass ${!toggleProfile && 'hidden'}`}>
               Change Profile
             </button>
             <button className={`mt-2 text-sm w-full border-2 dark:border-primary-light hover:bg-primary-light hover:text-primary-dark transition-all ease-in-out duration-700 ${!toggleProfile && 'hidden'}`}>
