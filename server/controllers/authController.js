@@ -74,10 +74,10 @@ exports.registerUser = async (req,res) => {
 exports.userLogout = (req, res) => {
     req.session.destroy(err => {
       if (err) {
-        return res.status(500).json({ message: 'Logout failed' });
+        return res.status(500).json({success:false, message: 'Logout failed' });
       }
       res.clearCookie('connect.sid');
-      res.json({ message: 'Logged out successfully', url: '/' });
+      res.json({ success:true, message: 'Logged out successfully' });
       console.log("A user just logged out!")
     });
   }

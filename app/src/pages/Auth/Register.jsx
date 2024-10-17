@@ -64,7 +64,7 @@ function Register() {
       } else {
         setLoading(false);
         setMessage(res.data.message);
-        setErrors(res.data.errors);
+        setErrors(res.data.message);
       }
     } catch (error) {
       setLoading(false);
@@ -96,9 +96,9 @@ function Register() {
       if (res.data.success === true) {
         setMessage(res.data.message);
         setSuccess(true);
-        localStorage.setItem("smartId", res.data.id);
-        localStorage.setItem("smartUsername", res.data.username);
-        localStorage.setItem("smartToken", res.data.token);
+        localStorage.setItem("smartId", res.data.data.id);
+        localStorage.setItem("smartUsername", res.data.data.username);
+        localStorage.setItem("smartToken", res.data.data.token);
         window.location.reload();
       } else {
         setLoading(false);

@@ -1,15 +1,52 @@
 /* eslint-disable react/prop-types */
-import { useState } from 'react';
 import { FaLaptop, FaMoon, FaSun } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
+import axios, { Axios } from 'axios';
 
 function TopAppBar({ theme, toggleTheme }) {
   const [toggleProfile, setToggleProfile] = useState(false);
+  const [user, setUser] = useState(null);
+  const userId = localStorage.getItem('smartId');
 
   const handleToggleProfile = () => setToggleProfile(!toggleProfile);
 
   const handleThemeChange = (selectedTheme) => {
     toggleTheme(selectedTheme); 
   };
+
+  const fetchUser = async () => {  
+      try{
+          const res = await axios.get(`http://localhost:10000/users/${userId}`);
+          if(res.data.success === true){
+              setUser(res.data.data);
+          } else{
+              console.error('Failed to fetch user', res.data.message);
+          }
+          
+      }catch(err){
+        console.error(err);
+      }
+  }
+  
+  useEffect(() => {
+    fetchUser();
+  },[])
+
+  const handleLogout = async () => {
+    try{
+      const res = await axios.post('http://localhost:10000/auth/logout');
+      if(res){
+        localStorage.removeItem('smartId');
+        localStorage.removeItem('smartUsername');
+        localStorage.removeItem('smartToken');
+        window.location.reload();
+      } else{
+        console.error('Failed to log out');
+      }
+    }catch(err){
+      console.error(err);
+    }
+  }
 
   return (
     <div>
@@ -28,7 +65,7 @@ function TopAppBar({ theme, toggleTheme }) {
               <img src='/logo.png' alt='profile' className={`w-full h-full rounded-full object-cover ${!toggleProfile && 'hidden'}`} />
             </span>
             <span className={`text-sm mt-2 font-bold ${!toggleProfile && 'hidden'}`}>
-              Kareem
+              {user && user.username}
             </span>
 
             <hr className={`w-full my-2 rounded bg-primary-glass dark:bg-accent-darkGray ${!toggleProfile && 'hidden'}`} />
@@ -61,8 +98,8 @@ function TopAppBar({ theme, toggleTheme }) {
             <button className={`mt-2 text-sm w-full dark:bg-primary-dark hover:bg-primary-glass ${!toggleProfile && 'hidden'}`}>
               Change Profile
             </button>
-            <button className={`mt-2 text-sm w-full border-2 dark:border-primary-light hover:bg-primary-light hover:text-primary-dark transition-all ease-in-out duration-700 ${!toggleProfile && 'hidden'}`}>
-              Login
+            <button onClick={handleLogout} className={`mt-2 text-sm w-full border-2 dark:border-primary-light hover:bg-primary-light hover:text-primary-dark transition-all ease-in-out duration-700 ${!toggleProfile && 'hidden'}`}>
+              {localStorage.getItem('smartId') ? 'Logout' : 'Login'}
             </button>
           </span>
         </div>
