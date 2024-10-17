@@ -7,32 +7,32 @@ const generateToken = (user) => {
   const payload = {
       id: user._id,
       email: user.email,
-      role: user.role 
   };
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
 };
 
 exports.userLogin = async (req, res) => {
-  const { usernameOrEmail, password } = req.body;
-
+  const { username, password } = req.body;
+  
   try {
     const user = await User.findOne({
-      $or: [{ username: usernameOrEmail }, { email: usernameOrEmail }]
+      $or: [{ username: username }, { email: username }]
     });
-
+    
     if (!user) {
+      console.log('User does not exist!');
       return res.status(400).json({ message: 'User does not exist!' });
     }
-
+    
     //password comparison
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
-
+    
     const token = generateToken(user);
-     // If login is successful, create a session
-     req.session.user = {
+    // If login is successful, create a session
+    req.session.user = {
       id: user._id,
       username: user.username,
       email: user.email,
@@ -55,20 +55,18 @@ exports.registerUser = async (req,res) => {
       const hashedPassword = await bcrypt.hash(password,salt);
       
       if(hashedPassword){
-        const userData = {
+        const userData = new User({
             username: username,
             email: email,
             phone: phone,
             password: hashedPassword
-        }
-        const newUser = await userData.save();
-
-        if(newUser){
-            console.log('New user created', newUser);
-            return res.status(201).json({success: true, data: newUser, message: 'New user created successfully!'})
-        }
+        })
+        await userData.save()
+        console.log('New user created', userData);
+        return res.status(201).json({success: true, data: userData, message: 'New user created successfully!'})
      }
   } catch(err){
+      console.log('Error while creating user', err);
       return res.status(500).json({success: false, message: 'Internal server error'});
   }
 }
