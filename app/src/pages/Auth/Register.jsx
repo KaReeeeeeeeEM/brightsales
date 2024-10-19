@@ -61,6 +61,7 @@ function Register() {
           password: "",
           confirm: "",
         });
+        setLoginForm(true);
       } else {
         setLoading(false);
         setMessage(res.data.message);
@@ -118,7 +119,7 @@ function Register() {
 
   return (
     <div className="w-full h-screen flex items-center justify-center bg-primary-light dark:bg-primary-dark">
-      <div className="w-[80%] md:w-[40%] lg:w-[35%] h-auto bg-accent-darkGray dark:bg-primary-glass mx-auto rounded-md">
+      <div className="w-[90%] md:w-[60%] lg:w-[35%] h-auto bg-accent-darkGray dark:bg-primary-glass mx-auto rounded-md">
         <form
           onSubmit={loginForm ? hanldeLogin : handleSubmit}
           className="w-full h-full flex flex-col items-center justify-center p-4"
@@ -145,27 +146,6 @@ function Register() {
               autoFocus={true}
             />
           </div>
-
-          {!loginForm && (
-            <div className="relative w-full mt-2 md:mt-4">
-              <label
-                className="block text-primary-light dark:text-accent-gray text-sm font-bold mb-2"
-                htmlFor="username"
-              >
-                Username
-              </label>
-              <input
-                className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
-                id="username"
-                name="username"
-                type="username"
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="Enter username"
-                autoFocus={true}
-              />
-            </div>
-          )}
 
           {!loginForm && (
             <div className="relative w-full mt-2 md:mt-4">
@@ -266,20 +246,14 @@ function Register() {
             }`}
             disabled={loading}
           >
-            {loading ? "Validating..." : "Login"}
+            {loginForm
+              ? loading
+                ? "Validating..."
+                : "Login"
+              : loading
+              ? "Creating Account..."
+              : "Create Account"}
           </button>
-
-          {!loginForm && (
-            <button
-              type="submit"
-              className={`w-full mt-6 px-4 py-2 text-accent-darkGray dark:text-accent-gray flex items-center justify-center text-center bg-primary dark:bg-accent-darkGray rounded-lg hover:opacity-85 transition ease-in-out duration-700 ${
-                loading ? "cursor-not-allowed opacity-50" : ""
-              }`}
-              disabled={loading}
-            >
-              {loading ? "Creating Account..." : "Create Account"}
-            </button>
-          )}
         </form>
         <div className="text-center my-4 flex flex-col">
           {errors.error && (

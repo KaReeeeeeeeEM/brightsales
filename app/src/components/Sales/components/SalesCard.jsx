@@ -1,16 +1,17 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useState } from "react";
-import { FaStackOverflow } from "react-icons/fa";
-import EditStockModal from "./EditStockModal";
+import { FaChartBar, FaStackOverflow } from "react-icons/fa";
+import EditSalesModal from "./EditSalesModal";
 import axios from "axios";
-import DeleteStockModal from "./DeleteStockModal";
+import DeleteSalesModal from "./DeleteSalesModal";
 
-function StockCard({ id, name, type, quantity, categories, seller, date, created, updated, callback }) {
-  const [openEditStockModal, setOpenEditStockModal] = useState(false);
-  const [openDeleteStockModal, setOpenDeleteStockModal] = useState(false);
+function SalesCard({ id, name, amount, stock, stockSelected, seller, date, created, updated, callback }) {
+  const [openEditSalesModal, setOpenEditSalesModal] = useState(false);
+  const [openDeleteSalesModal, setOpenDeleteSalesModal] = useState(false);
 
-  const toggleModal = () => setOpenEditStockModal(!openEditStockModal);
-  const toggleOpenDeleteModal = () => setOpenDeleteStockModal(!openDeleteStockModal);
+  const toggleModal = () => setOpenEditSalesModal(!openEditSalesModal);
+  const toggleOpenDeleteModal = () => setOpenDeleteSalesModal(!openDeleteSalesModal);
 
   // Utility function to calculate time difference
   const timeSince = (timestamp) => {
@@ -28,56 +29,52 @@ function StockCard({ id, name, type, quantity, categories, seller, date, created
     return `${days} day${days > 1 ? "s" : ""} ago`;
   };
 
-  const deleteStock = async () => {
-    await axios.delete(`http://localhost:10000/stock/${id}`)
+  const deleteExpense = async () => {
+    await axios.delete(`http://localhost:10000/sales/${id}`)
     .then(
       async res => {
         if(res.data.success === true){
             const newActivity = {
-              name: 'Stock Removed',
+              name: 'Sales Removed',
               seller: localStorage.getItem('smartId'),
-              details: `Removed ${quantity} of ${name} from the store`
+              details: `Removed ${amount} of ${name} from the sales list`
             }
             const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
             if(activityUpdate) callback();
         } else {
-          console.log('Error deleting stock', res.data.message);
+          console.log('Error deleting sales', res.data.message);
         }
       }
     )
     .catch(
       err => {
-        console.log('Check your internet connection and try again!')
+        console.log('Check your internet connection and try again!', err);
       }
     )
   } 
 
   return (
-    <span className="flex flex-col p-3 w-[16rem] h-auto rounded-lg bg-accent-gray dark:bg-primary-glass mr-4 shrink-0">
-      {openEditStockModal && (
-        <EditStockModal id={id} name={name} type={type} quantity={quantity} seller={seller} date={date} onClose={toggleModal} callback={callback} />
+    <span className="flex flex-col p-3 mt-2 w-full xl:w-[23.5%] md:w-[47.5%] h-auto rounded-lg bg-accent-gray dark:bg-primary-glass hover:opacity-[105] mr-4 shrink-0">
+      {openEditSalesModal && stock.length > 0 && stockSelected !== 'Stock removed' && (
+        <EditSalesModal id={id} name={name} amount={amount} stockSelected={stockSelected} stock={stock} seller={seller} date={date} onClose={toggleModal} callback={callback} />
       )}
-      {openDeleteStockModal && <DeleteStockModal name={name} confirm={deleteStock} onClose={toggleOpenDeleteModal} />}
+      {openDeleteSalesModal && <DeleteSalesModal name={name} confirm={deleteExpense} onClose={toggleOpenDeleteModal} />}
       <span className="w-full flex items-center justify-between">
         <span className="flex items-center">
-          <FaStackOverflow className="mr-2" />
-          <span className="text-gray font-semibold text-sm">{name}</span>
+          <FaChartBar className="mr-2" />
+          <span className={`text-gray font-semibold text-sm ${name === 'Stock name not present' ? 'italic line-through text-accent-darkGray' : ''}`}>{name}</span>
         </span>
 
         <span className="text-xs text-[#333] dark:text-accent-gray">
           {timeSince(created)}
         </span>
       </span>
-      <span className="text-sm flex items-center mt-2">
-        <span className="mr-2">Type: </span>
-        <span className="text-[#333] dark:text-accent-gray">{type}</span>
+      <span className="text-sm flex items-center">
+        <span className="mr-2">Amount: </span>
+        <span className="text-[#333] dark:text-accent-gray">Tsh {amount}/=</span>
       </span>
       <span className="text-sm flex items-center">
-        <span className="mr-2">Quantity: </span>
-        <span className="text-[#333] dark:text-accent-gray">{quantity}</span>
-      </span>
-      <span className="text-sm flex items-center">
-        <span className="mr-2">Added by: </span>
+        <span className="mr-2">Made by: </span>
         <span className="text-[#333] dark:text-accent-gray">
           {seller.username}
         </span>
@@ -101,4 +98,4 @@ function StockCard({ id, name, type, quantity, categories, seller, date, created
   );
 }
 
-export default StockCard;
+export default SalesCard;

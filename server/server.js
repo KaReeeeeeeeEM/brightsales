@@ -31,10 +31,20 @@ app.use(
 //import routes
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
+const stockRoutes = require('./routes/stockRoutes');
+const activityRoutes = require('./routes/activityRoutes');
+const categoryRoutes = require('./routes/categoryRoutes');
+const expenseRoutes = require('./routes/expenseRoutes');
+const salesRoutes = require('./routes/salesRoutes');
 
 //routes
 app.use("/auth", authRoutes);
 app.use("/users", userRoutes);
+app.use("/stock", stockRoutes);
+app.use("/activity", activityRoutes);
+app.use("/categories", categoryRoutes);
+app.use("/expenses", expenseRoutes);
+app.use("/sales", salesRoutes);
 
 // Placeholder route
 app.get("/", (req, res) => {

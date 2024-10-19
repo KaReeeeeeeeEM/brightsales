@@ -1,8 +1,16 @@
-import { useState } from "react";
-import { FaBoxOpen, FaChartBar, FaChartLine, FaCoins, FaTachometerAlt } from "react-icons/fa";
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-unused-vars */
+import { useEffect, useState } from "react";
+import {
+  FaBoxOpen,
+  FaChartBar,
+  FaChartLine,
+  FaCoins,
+  FaTachometerAlt,
+} from "react-icons/fa";
 import { Line } from "react-chartjs-2";
 import { Doughnut } from "react-chartjs-2";
-import ActivityCard from './ActivityCard';
+import ActivityCard from "./ActivityCard";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -14,6 +22,7 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
+import axios from "axios";
 
 ChartJS.register(
   CategoryScale,
@@ -27,8 +36,13 @@ ChartJS.register(
 );
 
 function DashboardContent() {
-  const [score, setScore] = useState(6.0);
-
+  const [score, setScore] = useState(0);
+  const [stockCount, setStockCount] = useState(0);
+  const [totalSales, setTotalSales] = useState(0);
+  const [weeklySales, setWeeklySales] = useState(0);
+  const [allWeeksSales, setAllWeeksSales] = useState([0, 0, 0, 0, 0, 0, 0]);
+  const [totalExpenses, setTotalExpenses] = useState(0);
+  const [activities, setActivities] = useState([]);
 
   const lineData = {
     labels: [
@@ -43,7 +57,7 @@ function DashboardContent() {
     datasets: [
       {
         label: "Weekly Sales (in Tsh)",
-        data: [12000, 15000, 18000, 17000, 20000, 21000, 25000],
+        data: allWeeksSales,
         borderColor: "#fff",
         backgroundColor: "#4b556350",
         fill: true,
@@ -92,7 +106,7 @@ function DashboardContent() {
     datasets: [
       {
         label: "Sales vs Expenses (in Tsh)",
-        data: [120000, 20000],
+        data: [totalSales, totalExpenses],
         backgroundColor: ["#fff", "#4b5563"],
         hoverOffset: 4,
       },
@@ -116,50 +130,107 @@ function DashboardContent() {
     },
   };
 
-  const activities = [
-    {
-      icon: (
-        <FaCoins className="text-sm md:text-md lg:text-xl w-full h-full rounded-full" />
-      ),
-      title: "Daily Sales",
-      content: "Tsh 12,000/=",
-    },
-    {
-      icon: (
-        <FaChartBar className="text-sm md:text-md lg:text-xl w-full h-full rounded-full" />
-      ),
-      title: "Weekly Sales",
-      content: "Tsh 15,000/=",
-    },
-    {
-      icon: (
-        <FaChartLine className="text-sm md:text-md lg:text-xl w-full h-full rounded-full" />
-      ),
-      title: "Monthly Sales",
-      content: "Tsh 20,000/=",
-    },
-    {
-      icon: (
-        <FaCoins className="text-sm md:text-md lg:text-xl w-full h-full rounded-full" />
-      ),
-      title: "Daily Expenses",
-      content: "Tsh 5,000/=",
-    },
-    {
-      icon: (
-        <FaChartBar className="text-sm md:text-md lg:text-xl w-full h-full rounded-full" />
-      ),
-      title: "Weekly Expenses",
-      content: "Tsh 10,000/=",
-    },
-    {
-      icon: (
-        <FaChartLine className="text-sm md:text-md lg:text-xl w-full h-full rounded-full" />
-      ),
-      title: "Monthly Expenses",
-      content: "Tsh 8,000/=",
-    },
-  ];
+  const fetchActivities = async () => {
+    await axios
+      .get("http://localhost:10000/activity")
+      .then((res) => {
+        setActivities(res.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')).reverse());
+      })
+      .catch((err) => {
+        console.log({
+          success: false,
+          message: `Error fetching activities ${err}`,
+        });
+      });
+  };
+
+  const fetchStock = async () => {
+    await axios
+      .get("http://localhost:10000/stock")
+      .then((res) => {
+        setStockCount(res.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')).length);
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const fetchExpenses = async () => {
+    await axios
+      .get("http://localhost:10000/expenses")
+      .then((res) => {
+        setTotalExpenses(res.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')).reduce((a, e) => (a += e.cost), 0));
+      })
+      .catch((err) => console.log(err));
+  };
+
+  const fetchSales = async () => {
+    await axios
+      .get("http://localhost:10000/sales")
+      .then((res) => {
+        setTotalSales(res.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')).reduce((a, s) => (a += s.amount), 0));
+
+        // filter weekly sales from all sales
+        const allSales = res.data.data.filter(f => f.seller._id === localStorage.getItem('smartId'));
+        allSales.filter((s) => {
+          const fullSaleDate = new Date(s.date);
+
+          const saleDay = fullSaleDate.getDay();
+          const today = new Date().getDay();
+
+          // current details
+          const currentDate = new Date().toISOString().split("T")[0].slice(-2);
+          const currentMonth = new Date()
+            .toISOString()
+            .split("T")[0]
+            .slice(-5, -3);
+          const currentYear = new Date()
+            .toISOString()
+            .split("T")[0]
+            .slice(0, 4);
+
+          // sale details
+          const salesDate = fullSaleDate.toISOString().split("T")[0].slice(-2);
+          const salesMonth = fullSaleDate
+            .toISOString()
+            .split("T")[0]
+            .slice(-5, -3);
+          const salesYear = fullSaleDate
+            .toISOString()
+            .split("T")[0]
+            .slice(0, 4);
+
+          const difference = parseInt(currentDate) - parseInt(salesDate);
+
+          if (parseInt(salesYear) === parseInt(currentYear))
+            parseInt(salesMonth) === parseInt(currentMonth)
+              ? difference === -1
+                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                : difference === 0
+                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                : difference === 1
+                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                : difference === 2
+                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                : difference === 3
+                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                : difference === 4
+                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                : difference === 5
+                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                : difference === 6
+                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                : ""
+              : "";
+        });
+      })
+      .catch((err) => console.log(err));
+  };
+
+  useEffect(() => {
+    fetchStock();
+    fetchSales();
+    fetchExpenses();
+    fetchActivities();
+  }, []);
 
   return (
     <div className="w-full flex flex-col items-start justify-start h-auto">
@@ -182,8 +253,12 @@ function DashboardContent() {
             </span>
           </span>
           <span className="mx-6 mt-4">
-            <span className="font-bold text-4xl text-primary-dark dark:text-primary-light">100</span>
-            <span className="text-md text-accent-darkGray ml-1">items</span>
+            <span className="font-bold text-4xl text-primary-dark dark:text-primary-light">
+              {stockCount}
+            </span>
+            <span className="text-md text-accent-darkGray ml-1">
+              {stockCount === 1 ? "item" : "items"}
+            </span>
           </span>
         </div>
 
@@ -200,7 +275,13 @@ function DashboardContent() {
           </span>
           <span className="mx-6 mt-4">
             <span className="text-lg text-accent-darkGray mr-1">Tshs</span>
-            <span className="font-bold text-4xl text-primary-dark dark:text-primary-light">250k</span>
+            <span className="font-bold text-4xl text-primary-dark dark:text-primary-light">
+              {totalSales > 1000000
+                ? totalSales / 1000000 + "M"
+                : totalSales > 1000
+                ? totalSales / 1000 + "k"
+                : totalSales}
+            </span>
           </span>
         </div>
 
@@ -217,7 +298,13 @@ function DashboardContent() {
           </span>
           <span className="mx-6 mt-4">
             <span className="text-lg text-accent-darkGray mr-1">Tshs</span>
-            <span className="font-bold text-4xl text-primary-dark dark:text-primary-light">120k</span>
+            <span className="font-bold text-4xl text-primary-dark dark:text-primary-light">
+              {allWeeksSales.reduce((a, s) => (a += s), 0) > 1000000
+                ? allWeeksSales.reduce((a, s) => (a += s), 0) / 1000000 + "M"
+                : allWeeksSales.reduce((a, s) => (a += s), 0) > 1000
+                ? allWeeksSales.reduce((a, s) => (a += s), 0) / 1000 + "k"
+                : allWeeksSales.reduce((a, s) => (a += s), 0)}
+            </span>
           </span>
         </div>
 
@@ -234,7 +321,13 @@ function DashboardContent() {
           </span>
           <span className="mx-6 mt-4">
             <span className="text-lg text-accent-darkGray mr-1">Tshs</span>
-            <span className="font-bold text-4xl text-primary-dark dark:text-primary-light">20k</span>
+            <span className="font-bold text-4xl text-primary-dark dark:text-primary-light">
+              {totalExpenses > 1000000
+                ? totalExpenses / 1000000 + "M"
+                : totalExpenses > 1000
+                ? totalExpenses / 1000 + "k"
+                : totalExpenses}
+            </span>
           </span>
         </div>
       </div>
@@ -252,16 +345,25 @@ function DashboardContent() {
           <span className="absolute flex flex-col items-center justify-center mx-auto mt-16 w-16 h-16">
             <span
               className={`text-sm font-bold ${
-                score < 5
+                totalSales / totalExpenses < 1
                   ? "text-red-600"
-                  : score === 5
+                  : totalSales / totalExpenses === 1
                   ? "text-orange-600"
                   : "text-green-600"
               }`}
             >
-              {score < 5 ? "Weak" : score === 5 ? "Balanced" : "Good"}
+              {totalSales !== 0 && totalExpenses !== 0 &&  (totalSales / totalExpenses < 1
+                ? "Weak"
+                : totalSales / totalExpenses === 1
+                ? "Balanced"
+                : totalSales / totalExpenses > 1 &&
+                  totalSales / totalExpenses < 3
+                ? "Good"
+                : "Excellent")}
             </span>
-            <span className="text-primary-light text-lg font-bold">6.0</span>
+            <span className="text-primary-light text-lg font-bold">
+              {totalSales !== 0 && totalExpenses !== 0 && Math.round((totalSales * 100) / totalExpenses) / 100}
+            </span>
           </span>
         </div>
       </div>
@@ -270,12 +372,26 @@ function DashboardContent() {
       <span className="mt-12 text-primary-dark dark:text-accent-gray font-bold text-lg md:text-xl lg:text-2xl">
         Recent Activities
       </span>
-    
+
       {/* table */}
-        <div className='w-full flex overflow-x-auto my-8 py-2'>
-            {/* <span className='w-full text-primary-dark dark:text-accent-darkGray text-center text-sm'>There are no stock updates currently</span> */}
-            {activities.map((a,c) => <ActivityCard key={c} title={a.title} activity={a.activity} icon={a.icon} />)}
-        </div>
+      <div className="w-full flex overflow-x-auto my-8 py-2">
+        {activities.length === 0 ? (
+          <span className="w-full text-primary-dark dark:text-accent-darkGray text-center text-sm">
+            There are no activity updates currently
+          </span>
+        ) : (
+          activities
+            .slice(0, 20)
+            .map((a, c) => (
+              <ActivityCard
+                key={c}
+                title={a.name}
+                activity={a.details}
+                date={a.createdAt}
+              />
+            ))
+        )}
+      </div>
     </div>
   );
 }

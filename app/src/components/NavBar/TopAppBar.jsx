@@ -50,17 +50,17 @@ function TopAppBar({ theme, toggleTheme }) {
 
   return (
     <div>
-      <nav className="fixed w-screen h-auto flex items-center justify-between bg-primary-dark text-white dark:text-gray-200 shadow-lg py-1 lg:py-0 z-20">
+      <nav className="fixed w-screen h-auto flex items-center justify-between bg-gray-700 dark:bg-primary-dark text-white dark:text-gray-200 shadow-lg py-1 lg:py-0 z-20">
         <span className="flex items-center font-bold text-2xl">
           <img src='/logo-dark.png' alt='logo' className='w-12 h-12 lg:w-16 lg:h-16' />
         </span>
         <div className="flex items-center px-4">
           <span onClick={handleToggleProfile} className='relative w-10 h-10 md:w-12 md:h-12 rounded-full bg-accent-darkGray border-2 border-accent-gray cursor-pointer ml-2'>
-            <img src='/logo.png' alt='profile' className='w-full h-full rounded-full object-cover' />
+            <img src={theme === 'dark'? '/logo.png' : '/logo-dark.png'} alt='profile' className='w-full h-full rounded-full object-cover' />
           </span>
 
           {/* Profile block */}
-          <span className={`flex flex-col items-center justify-center transform ${toggleProfile ? 'w-48 md:w-60 lg:w-56 h-auto top-16 lg:top-20 right-2 opacity-1' : 'w-0 h-0 top-16 lg:top-20 right-2 opacity-0'} absolute bg-primary-dark dark:bg-primary-glass p-2 rounded-lg transition-all ease-in-out duration-700 shadow-xl z-10`}>
+          <span className={`flex flex-col items-center justify-center transform ${toggleProfile ? 'w-48 md:w-60 lg:w-56 h-auto top-16 lg:top-20 right-2 opacity-1' : 'w-0 h-0 top-16 lg:top-20 right-2 opacity-0'} absolute bg-gray-700 dark:bg-primary-glass p-2 rounded-lg transition-all ease-in-out duration-700 shadow-xl z-10`}>
             <span className={`w-12 h-12 border-2 border-accent-darkGray bg-accent-darkGray rounded-full ${!toggleProfile && 'hidden'}`}>
               <img src='/logo.png' alt='profile' className={`w-full h-full rounded-full object-cover ${!toggleProfile && 'hidden'}`} />
             </span>

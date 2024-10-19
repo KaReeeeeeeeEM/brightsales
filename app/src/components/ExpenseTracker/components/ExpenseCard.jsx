@@ -1,16 +1,17 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useState } from "react";
 import { FaStackOverflow } from "react-icons/fa";
-import EditStockModal from "./EditStockModal";
+import EditExpensesModal from "./EditExpensesModal";
 import axios from "axios";
-import DeleteStockModal from "./DeleteStockModal";
+import DeleteExpensesModal from "./DeleteExpensesModal";
 
-function StockCard({ id, name, type, quantity, categories, seller, date, created, updated, callback }) {
-  const [openEditStockModal, setOpenEditStockModal] = useState(false);
-  const [openDeleteStockModal, setOpenDeleteStockModal] = useState(false);
+function ExpenseCard({ id, name, cost, seller, date, created, updated, callback }) {
+  const [openEditExpensesModal, setOpenEditExpensesModal] = useState(false);
+  const [openDeleteExpensesModal, setOpenDeleteExpensesModal] = useState(false);
 
-  const toggleModal = () => setOpenEditStockModal(!openEditStockModal);
-  const toggleOpenDeleteModal = () => setOpenDeleteStockModal(!openDeleteStockModal);
+  const toggleModal = () => setOpenEditExpensesModal(!openEditExpensesModal);
+  const toggleOpenDeleteModal = () => setOpenDeleteExpensesModal(!openDeleteExpensesModal);
 
   // Utility function to calculate time difference
   const timeSince = (timestamp) => {
@@ -28,36 +29,36 @@ function StockCard({ id, name, type, quantity, categories, seller, date, created
     return `${days} day${days > 1 ? "s" : ""} ago`;
   };
 
-  const deleteStock = async () => {
-    await axios.delete(`http://localhost:10000/stock/${id}`)
+  const deleteExpense = async () => {
+    await axios.delete(`http://localhost:10000/expenses/${id}`)
     .then(
       async res => {
         if(res.data.success === true){
             const newActivity = {
-              name: 'Stock Removed',
+              name: 'Expense Removed',
               seller: localStorage.getItem('smartId'),
-              details: `Removed ${quantity} of ${name} from the store`
+              details: `Removed ${cost} of ${name} from the expense list`
             }
             const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
             if(activityUpdate) callback();
         } else {
-          console.log('Error deleting stock', res.data.message);
+          console.log('Error deleting expense', res.data.message);
         }
       }
     )
     .catch(
       err => {
-        console.log('Check your internet connection and try again!')
+        console.log('Check your internet connection and try again!', err);
       }
     )
   } 
 
   return (
-    <span className="flex flex-col p-3 w-[16rem] h-auto rounded-lg bg-accent-gray dark:bg-primary-glass mr-4 shrink-0">
-      {openEditStockModal && (
-        <EditStockModal id={id} name={name} type={type} quantity={quantity} seller={seller} date={date} onClose={toggleModal} callback={callback} />
+    <span className="flex flex-col p-3 mt-2 w-full xl:w-[23.5%] md:w-[47.5%] h-auto rounded-lg bg-accent-gray dark:bg-primary-glass mr-4 shrink-0">
+      {openEditExpensesModal && (
+        <EditExpensesModal id={id} name={name} cost={cost} seller={seller} date={date} onClose={toggleModal} callback={callback} />
       )}
-      {openDeleteStockModal && <DeleteStockModal name={name} confirm={deleteStock} onClose={toggleOpenDeleteModal} />}
+      {openDeleteExpensesModal && <DeleteExpensesModal name={name} confirm={deleteExpense} onClose={toggleOpenDeleteModal} />}
       <span className="w-full flex items-center justify-between">
         <span className="flex items-center">
           <FaStackOverflow className="mr-2" />
@@ -68,16 +69,12 @@ function StockCard({ id, name, type, quantity, categories, seller, date, created
           {timeSince(created)}
         </span>
       </span>
-      <span className="text-sm flex items-center mt-2">
-        <span className="mr-2">Type: </span>
-        <span className="text-[#333] dark:text-accent-gray">{type}</span>
+      <span className="text-sm flex items-center">
+        <span className="mr-2">Total: </span>
+        <span className="text-[#333] dark:text-accent-gray">Tsh {cost}/=</span>
       </span>
       <span className="text-sm flex items-center">
-        <span className="mr-2">Quantity: </span>
-        <span className="text-[#333] dark:text-accent-gray">{quantity}</span>
-      </span>
-      <span className="text-sm flex items-center">
-        <span className="mr-2">Added by: </span>
+        <span className="mr-2">Incurred by: </span>
         <span className="text-[#333] dark:text-accent-gray">
           {seller.username}
         </span>
@@ -101,4 +98,4 @@ function StockCard({ id, name, type, quantity, categories, seller, date, created
   );
 }
 
-export default StockCard;
+export default ExpenseCard;
