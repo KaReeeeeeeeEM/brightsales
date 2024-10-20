@@ -19,6 +19,7 @@ function EditCategoriesModal({ onClose, callback, id, name }) {
   };
 
   const handleSubmit = async (e) => {
+    setLoading(true)
     e.preventDefault();
     const {name} = formData;
     if (!name) {
@@ -47,9 +48,13 @@ function EditCategoriesModal({ onClose, callback, id, name }) {
         }
       })
       .catch((err) => {
+        setLoading(false)
         console.log(err.response.data.message ? err.response.data.message : "Error while updating category", err);
         setErrors(err.response.data.message ? err.response.data.message : "Error while updating category");
-      });
+      })
+      .finally(
+        () => setLoading(false)
+      )
   };
 
   return (

@@ -8,12 +8,15 @@ import SalesModal from "./components/SalesModal";
 function Sales() {
   const [sales, setSales] = useState([]);
   const [stock, setStock] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [openSalesModal, setOpenSalesModal] = useState(false);
 
   const fetchSales = async () => {
+    setLoading(true)
     await axios
       .get("https://oyster-app-k8jcp.ondigitalocean.app/sales")
       .then((res) => {
+        setLoading(false)
         setSales(
           res.data.data
             .filter(
@@ -23,13 +26,22 @@ function Sales() {
             .reverse()
         );
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        setLoading(false)
+        console.log(err)
+      }
+      )
+      .finally(
+        () => setLoading(false)
+      )
   };
 
   const fetchStock = async () => {
+    setLoading(true)
     await axios
       .get("https://oyster-app-k8jcp.ondigitalocean.app/stock")
       .then((res) => {
+        setLoading(false)
         setStock(
           res.data.data
             .filter(
@@ -48,7 +60,11 @@ function Sales() {
             .reverse()
         );
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        setLoading(false)
+        console.log(err)
+      })
+      .finally(() => setLoading(false))
   };
 
   useEffect(() => {
@@ -73,7 +89,7 @@ function Sales() {
           <FaChartBar className="mr-2" />
           Sales (
           <span className="text-primary-dark dark:text-accent-gray">
-            {sales && sales.reduce((a, e) => (a += e.amount), 0) > 1000000
+            {!loading && sales && sales.reduce((a, e) => (a += e.amount), 0) > 1000000
               ? sales.reduce((a, e) => (a += e.amount), 0) / 1000000 + "M"
               : sales.reduce((a, e) => (a += e.amount), 0) > 1000
               ? sales.reduce((a, e) => (a += e.amount), 0) / 1000 + "k"
@@ -93,7 +109,11 @@ function Sales() {
       </span>
 
       <div className="w-full flex flex-col md:flex-row flex-wrap my-8 py-2">
-        {sales && sales.length === 0 ? (
+        {
+          loading ?
+        <span className="w-full text-primary-dark dark:text-accent-darkGray text-center text-sm">Fetching sales...</span>
+        :
+        sales && sales.length === 0 ? (
           <span className="w-full text-primary-dark dark:text-accent-darkGray text-center text-sm">
             There are no sales recorded
           </span>

@@ -21,6 +21,7 @@ function StockModal({ onClose, callback, categories }) {
   };
 
   const handleSubmit = async (e) => {
+    setLoading(true)
     e.preventDefault();
     const { name, type, quantity, date } = formData;
     if (!name || !type || !quantity || !date) {
@@ -65,9 +66,13 @@ function StockModal({ onClose, callback, categories }) {
         }
       })
       .catch((err) => {
+        setLoading(false)
         console.log(err.response.data.message ? err.response.data.message : "Error while adding stock", err);
         setErrors(err.response.data.message ? err.response.data.message : "Error while adding stock");
-      });
+      })
+      .finally(
+        () => setLoading(false)
+      )
   };
 
   return (

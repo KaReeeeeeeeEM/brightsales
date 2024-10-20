@@ -31,6 +31,7 @@ ChartJS.register(
 );
 
 function StockManager() {
+  const [loading, setLoading] = useState(false);
   const [stock, setStock] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [allCategories, setAllCategories] = useState([]);
@@ -115,8 +116,28 @@ function StockManager() {
       },
     },
   };
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/categories");
+      const categories = response.data.data
+        .filter(
+          (c) => c.seller && c.seller._id === localStorage.getItem("smartId")
+        )
+        .map((category) => category.name.toLowerCase().trim());
+      setAllCategories(categories);
+    } catch (error) {
+      setLoading(false)
+      console.error("Error fetching categories:", error);
+    } finally{
+      setLoading(false)
+    }
+  };
+  
   const fetchStock = async () => {
     try {
+      setLoading(true)
       const response = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/stock");
       const allStock = response.data.data.filter(
         (item) =>
@@ -160,9 +181,12 @@ function StockManager() {
         if (parseInt(currentYear) === parseInt(salesYear)) {
           if (parseInt(currentMonth) === parseInt(salesMonth)) {
             stockData[date - 1] +=
-              (item.type.toLowerCase().trim() !== "capital" || !item.type.toLowerCase().trim().includes('capital')) &&
-              (item.type.toLowerCase().trim() !== "mtaji" || !item.type.toLowerCase().trim().includes('mtaji')) &&
-              (item.type.toLowerCase().trim() !== "kianzio" || !item.type.toLowerCase().trim().includes('kianzio')) &&
+              (item.type.toLowerCase().trim() !== "capital" ||
+                !item.type.toLowerCase().trim().includes("capital")) &&
+              (item.type.toLowerCase().trim() !== "mtaji" ||
+                !item.type.toLowerCase().trim().includes("mtaji")) &&
+              (item.type.toLowerCase().trim() !== "kianzio" ||
+                !item.type.toLowerCase().trim().includes("kianzio")) &&
               parseInt(
                 item.quantity
                   .split(" ")
@@ -173,46 +197,39 @@ function StockManager() {
       });
 
       setAllMonthsStock(stockData);
-
-      // Count the occurrences of each type in the stock
-      const typeCountMap = {};
-      allStock.forEach((item) => {
-        const type = item.type.toLowerCase().trim();
-        if (typeCountMap[type]) {
-          typeCountMap[type] += 1;
-        } else {
-          typeCountMap[type] = 1;
-        }
-      });
-
-      // Set the allWeekGroceries state based on the counts of each category
-      const groceriesData = allCategories.map(
-        (category) => typeCountMap[category] || 0
-      );
-      setAllWeekGroceries(groceriesData);
     } catch (error) {
+      setLoading(false)
       console.error("Error fetching stock data:", error);
+    }finally{
+      setLoading(false)
     }
   };
 
-  const fetchCategories = async () => {
-    try {
-      const response = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/categories");
-      const categories = response.data.data
-        .filter(
-          (c) => c.seller && c.seller._id === localStorage.getItem("smartId")
-        )
-        .map((category) => category.name.toLowerCase().trim());
-      setAllCategories(categories);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
+ 
 
   useEffect(() => {
     fetchCategories();
     fetchStock();
-  }, [stock]);
+  }, []);
+
+  useEffect(() => {
+     // Count the occurrences of each type in the stock
+     const typeCountMap = {};
+     stock.forEach((item) => {
+       const type = item.type.toLowerCase().trim();
+       if (typeCountMap[type]) {
+         typeCountMap[type] += 1;
+       } else {
+         typeCountMap[type] = 1;
+       }
+     });
+
+     // Set the allWeekGroceries state based on the counts of each category
+     const groceriesData = allCategories.map(
+       (category) => typeCountMap[category] || 0
+     );
+     setAllWeekGroceries(groceriesData);
+  },[stock])
 
   const doughnutData = {
     labels: allCategories,
@@ -260,7 +277,7 @@ function StockManager() {
           <FaBoxOpen className="mr-2" />
           StockManager (
           <span className="text-primary-dark dark:text-accent-gray">
-            {allMonthsStock.reduce(
+            {!loading && allMonthsStock.reduce(
               (a, s) =>
                 (a += !isNaN(s.quantity)
                   ? s.quantity
@@ -276,7 +293,7 @@ function StockManager() {
           <FaBoxOpen className="mr-2" />
           Stock (
           <span className="text-primary-dark dark:text-accent-gray">
-            {allMonthsStock.reduce(
+            {!loading && allMonthsStock.reduce(
               (a, s) =>
                 (a += !isNaN(s.quantity)
                   ? s.quantity
@@ -300,7 +317,11 @@ function StockManager() {
       </span>
 
       <div className="w-full flex overflow-x-auto my-8 py-2">
-        {stock.length === 0 ? (
+        {loading ? (
+          <span className="w-full text-primary-dark dark:text-accent-darkGray text-center text-sm">
+            Fetching stock from the store...
+          </span>
+        ) : stock.length === 0 ? (
           <span className="w-full text-primary-dark dark:text-accent-darkGray text-center text-sm">
             There are no stock updates currently
           </span>

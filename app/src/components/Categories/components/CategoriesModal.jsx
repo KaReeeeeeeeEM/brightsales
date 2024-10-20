@@ -21,6 +21,7 @@ function CategoriesModal({ onClose, callback }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true)
     const { name } = formData;
     if (!name) {
       setErrors("Category cannot be empty!");
@@ -59,9 +60,13 @@ function CategoriesModal({ onClose, callback }) {
         }
       })
       .catch((err) => {
+        setLoading(false)
         console.log(err.response.data.message ? err.response.data.message : "Error while adding category", err);
         setErrors(err.response.data ? err.response.data.message : "Error while adding category");
-      });
+      })
+      .finally(
+        () => setLoading(false)
+      )
   };
 
   return (

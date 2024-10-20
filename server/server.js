@@ -13,7 +13,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
+  store: MongoStore.create({ mongoUrl: process.env.MONGO_URI}),
   cookie: { maxAge: 1000 * 60 * 60 * 24 },
 }));
 
@@ -48,7 +48,7 @@ app.use("/sales", salesRoutes);
 
 // Placeholder route
 app.get("/", (req, res) => {
-  console.log("User visited ", req);
+  console.log("User visited ", req.route);
   return res.json({ data: "API is running..." });
 });
 

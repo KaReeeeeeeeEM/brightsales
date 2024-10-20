@@ -21,6 +21,7 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
   };
 
   const handleSubmit = async (e) => {
+    setLoading(true)
     e.preventDefault();
     const { stock, amount, date } = formData;
     if (!stock || !amount || !date) {
@@ -53,9 +54,13 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
         }
       })
       .catch((err) => {
+        setLoading(false)
         console.log(err.response.data.message ? err.response.data.message : "Error while updating expense", err);
         setErrors(err.response.data.message ? err.response.data.message : "Error while updating expense");
-      });
+      })
+      .finally(
+        () => setLoading(false)
+      )
   };
 
   return (

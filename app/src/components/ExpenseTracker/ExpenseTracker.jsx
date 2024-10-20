@@ -6,23 +6,31 @@ import axios from "axios";
 import ExpenseModal from "./components/ExpenseModal";
 
 function ExpenseTracker() {
-  const [score, setScore] = useState(6.0);
+  const [loading, setLoading] = useState(false);
   const [expenses, setExpenses] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [openStockModal, setOpenStockModal] = useState(false);
 
   const fetchExpenses = async () => {
+    setLoading(true)
     await axios
       .get("https://oyster-app-k8jcp.ondigitalocean.app/expenses")
       .then((res) => {
+        setLoading(false)
         setExpenses(
           res.data.data
             .filter((f) => f.seller && f.seller._id === localStorage.getItem("smartId"))
             .reverse()
         );
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        setLoading(false)
+        console.log(err)
+      })
+      .finally(
+        () => setLoading(false)
+      )
   };
 
   useEffect(() => {
@@ -54,7 +62,7 @@ function ExpenseTracker() {
           <FaCoins className="mr-2" />
           Expenses (
           <span className="block md:hidden text-primary-dark dark:text-accent-gray">
-            {expenses && expenses.reduce((a, e) => (a += e.cost), 0) > 1000000
+            {!loading && expenses && expenses.reduce((a, e) => (a += e.cost), 0) > 1000000
               ? expenses.reduce((a, e) => (a += e.cost), 0) / 1000000 + "M"
               : expenses.reduce((a, e) => (a += e.cost), 0) > 1000
               ? expenses.reduce((a, e) => (a += e.cost), 0) / 1000 + "k"
@@ -81,7 +89,11 @@ function ExpenseTracker() {
       </span>
 
       <div className="w-full flex flex-col md:flex-row flex-wrap my-8 py-2">
-        {expenses && expenses.length === 0 ? (
+        {
+          loading ?
+          <span className="w-full text-primary-dark dark:text-accent-darkGray text-center text-sm">Fetching expenses...</span>
+          :
+        expenses && expenses.length === 0 ? (
           <span className="w-full text-primary-dark dark:text-accent-darkGray text-center text-sm">
             There are no expenses recorded
           </span>

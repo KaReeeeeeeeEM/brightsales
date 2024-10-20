@@ -23,6 +23,7 @@ function SalesModal({ onClose, callback, stock }) {
   };
 
   const handleSubmit = async (e) => {
+    setLoading(true)
     e.preventDefault();
     const { stock, amount, date } = formData;
     if (!stock || !amount || !date) {
@@ -66,9 +67,13 @@ function SalesModal({ onClose, callback, stock }) {
         }
       })
       .catch((err) => {
+        setLoading(false)
         console.log(err.response.data.message ? err.response.data.message : "Error while adding sale", err);
         setErrors(err.response.data.message ? err.response.data.message : "Error while adding sale");
-      });
+      })
+      .finally(
+        () => setLoading(false)
+      )
   };
 
   return (

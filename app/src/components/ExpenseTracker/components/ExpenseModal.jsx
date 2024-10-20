@@ -22,6 +22,7 @@ function ExpenseModal({ onClose, callback }) {
   };
 
   const handleSubmit = async (e) => {
+    setLoading(true)
     e.preventDefault();
     const { name, cost, date } = formData;
     if (!name || !cost || !date) {
@@ -64,9 +65,13 @@ function ExpenseModal({ onClose, callback }) {
         }
       })
       .catch((err) => {
+        setLoading(false)
         console.log(err.response.data.message ? err.response.data.message : "Error while adding expense", err);
         setErrors(err.response.data.message ? err.response.data.message : "Error while adding expense");
-      });
+      })
+      .finally(
+        () => setLoading(false)
+      )
   };
 
   return (

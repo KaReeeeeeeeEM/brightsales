@@ -55,7 +55,7 @@ function StockCard({ id, name, type, quantity, categories, seller, date, created
   return (
     <span className="flex flex-col p-3 w-[16rem] h-auto rounded-lg bg-accent-gray dark:bg-primary-glass mr-4 shrink-0">
       {openEditStockModal && (
-        <EditStockModal id={id} name={name} type={type} quantity={quantity} seller={seller} date={date} onClose={toggleModal} callback={callback} />
+        <EditStockModal id={id} name={name} type={type} categories={categories} quantity={quantity} seller={seller} date={date} onClose={toggleModal} callback={callback} />
       )}
       {openDeleteStockModal && <DeleteStockModal name={name} confirm={deleteStock} onClose={toggleOpenDeleteModal} />}
       <span className="w-full flex items-center justify-between">

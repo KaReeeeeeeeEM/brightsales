@@ -2,7 +2,7 @@
 import axios from "axios";
 import React, { useState } from "react";
 
-function EditStockModal({ onClose, callback, id, name, type, quantity, date , seller}) {
+function EditStockModal({ onClose, callback, id, categories, name, type, quantity, date , seller}) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState("");
@@ -112,12 +112,9 @@ function EditStockModal({ onClose, callback, id, name, type, quantity, date , se
                 onChange={handleChange}
                 className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
               >
-                <option value="">Select stock type</option>
-                <option value="grains">Grains</option>
-                <option value="groceries">Groceries</option>
-                <option value="fruits">Fruits</option>
-                <option value="veggies">Veggetables</option>
-                <option value="Liquids">Oils & liquids</option>
+              <option value="">Choose category of stock</option>
+                <option value="Capital">Capital (mtaji)</option>
+                {categories.map((c,i) => <option key={i} value={c}>{c}</option>)}
               </select>
             </div>
 

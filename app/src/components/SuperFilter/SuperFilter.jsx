@@ -16,9 +16,11 @@ function SuperFilter() {
   const [results, setResults] = useState([]);
   const [keyword, setKeyword] = useState("");
   const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
 
   const fetchAllTypes = async () => {
+    setLoading(true);
     const allStock = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/stock");
     const allSales = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/sales");
     const allCategories = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/categories");
@@ -61,6 +63,7 @@ function SuperFilter() {
         )
         .reverse()
     );
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -68,6 +71,7 @@ function SuperFilter() {
   }, []);
 
   const handleSubmit = async () => {
+    setLoading(true);
     if (query !== "" && query.includes(":")) {
       const typeChosen = query.split(":")[0].toLowerCase().trim();
       const keywordChosen = query.split(":")[1].toLowerCase().trim();
@@ -86,9 +90,12 @@ function SuperFilter() {
       } else {
         setResults([]);
       }
+      setLoading(false);
     } else {
+      setLoading(true);
       setType("");
       setResults([]);
+      setLoading(false);
     }
   };
 
@@ -399,7 +406,12 @@ function SuperFilter() {
 
       {/* search results */}
       <div className="w-full flex flex-col md:flex-row flex-wrap md:my-8 py-2">
-        {type === "sales" &&
+        {loading ? (
+          <span className="w-full text-primary-dark dark:text-accent-darkGray text-center text-sm">
+            Filtering...
+          </span>
+        ) : (
+          type === "sales" &&
           (keyword === ""
             ? sales
             : sales.filter(
@@ -421,9 +433,15 @@ function SuperFilter() {
               updated={s.updatedAt}
               callback={fetchAllTypes}
             />
-          ))}
+          ))
+        )}
 
-        {type === "category" &&
+        {loading ? (
+          <span className="w-full text-primary-dark dark:text-accent-darkGray text-center text-sm">
+            Filtering...
+          </span>
+        ) : (
+          type === "category" &&
           (keyword === ""
             ? categories
             : categories.filter((st) =>
@@ -440,9 +458,15 @@ function SuperFilter() {
               updated={c.updatedAt}
               callback={fetchAllTypes}
             />
-          ))}
+          ))
+        )}
 
-        {type === "stock" &&
+        {loading ? (
+          <span className="w-full text-primary-dark dark:text-accent-darkGray text-center text-sm">
+            Filtering...
+          </span>
+        ) : (
+          type === "stock" &&
           (keyword === ""
             ? stock
             : stock.filter((st) =>
@@ -461,9 +485,15 @@ function SuperFilter() {
               updated={s.updatedAt}
               callback={fetchAllTypes}
             />
-          ))}
+          ))
+        )}
 
-        {type === "expenses" &&
+        {loading ? (
+          <span className="w-full text-primary-dark dark:text-accent-darkGray text-center text-sm">
+            Filtering...
+          </span>
+        ) : (
+          type === "expenses" &&
           (keyword === ""
             ? expenses
             : expenses.filter((st) =>
@@ -481,7 +511,8 @@ function SuperFilter() {
               updated={e.updatedAt}
               callback={fetchAllTypes}
             />
-          ))}
+          ))
+        )}
       </div>
     </div>
   );
