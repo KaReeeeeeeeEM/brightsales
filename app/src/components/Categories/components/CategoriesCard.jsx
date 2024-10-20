@@ -30,7 +30,7 @@ function CategoriesCard({ id, name, seller, date, created, updated, callback }) 
   };
 
   const deleteCategory = async () => {
-    await axios.delete(`http://localhost:10000/categories/${id}`)
+    await axios.delete(`https://oyster-app-k8jcp.ondigitalocean.app/categories/${id}`)
     .then(
       async res => {
         if(res.data.success === true){
@@ -39,7 +39,7 @@ function CategoriesCard({ id, name, seller, date, created, updated, callback }) 
               seller: localStorage.getItem('smartId'),
               details: `Removed ${name} category from the categories list`
             }
-            const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
+            const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
             if(activityUpdate) callback();
         } else {
           console.log('Error deleting Categories', res.data.message);
@@ -54,7 +54,7 @@ function CategoriesCard({ id, name, seller, date, created, updated, callback }) 
   } 
 
   return (
-    <span className="flex flex-col p-3 mt-2 w-full xl:w-[23.5%] md:w-[47.5%] h-auto rounded-lg bg-accent-gray dark:bg-primary-glass hover:opacity-[105] mr-4 shrink-0">
+    <span className="flex flex-col p-3 mt-2 w-full xl:w-[23.5%] md:w-[47%] h-auto rounded-lg bg-accent-gray dark:bg-primary-glass hover:opacity-[105] mr-4 shrink-0">
       {openEditCategoriesModal && (
         <EditCategoriesModal id={id} name={name} date={date} onClose={toggleModal} callback={callback} />
       )}

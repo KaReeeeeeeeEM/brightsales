@@ -1,16 +1,16 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import axios from "axios";
 import React, { useState } from "react";
 
-function EditExpensesModal({ onClose, callback, id, name,cost, date }) {
+function StockModal({ onClose, callback, categories }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState("");
   const [formData, setFormData] = useState({
-    name: name,
-    cost: cost,
-    date: date,
+    name: "",
+    type: "",
+    quantity: "",
+    date: "",
   });
 
   const handleChange = (e) => {
@@ -22,39 +22,51 @@ function EditExpensesModal({ onClose, callback, id, name,cost, date }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, cost, date } = formData;
-    if (!name || !cost || !date) {
+    const { name, type, quantity, date } = formData;
+    if (!name || !type || !quantity || !date) {
       setErrors("Please fill all fields!");
       return;
     }
 
     const finalData = {
       name: name,
-      cost: cost,
+      type: type,
+      quantity: quantity,
       seller: localStorage.getItem("smartId"),
       date: date,
     };
 
     await axios
-      .put(`https://oyster-app-k8jcp.ondigitalocean.app/expenses/${id}`, finalData)
-      .then((res) => {
+      .post("https://oyster-app-k8jcp.ondigitalocean.app/stock", finalData)
+      .then(async (res) => {
         const { success, message } = res.data;
         if (success && success === true) {
           setMessage(res.data.message);
-          setFormData({
-            name: "",
-            cost: "",
-            date: "",
-          });
-          callback()
-          onClose();
+          const newActivity = {
+            name: 'Stock Added',
+            seller: localStorage.getItem('smartId'),
+            details: `Added ${finalData.quantity} of ${finalData.name}`
+          }
+          const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
+          if(activityUpdate.data.success === true){
+                setFormData({
+                  name: "",
+                  type: "",
+                  quantity: "",
+                  date: "",
+                });
+                callback()
+                onClose();
+          } else {
+            setErrors(activityUpdate.data.message);
+          }
         } else {
           setErrors(message);
         }
       })
       .catch((err) => {
-        console.log(err.response.data.message ? err.response.data.message : "Error while updating expense", err);
-        setErrors(err.response.data.message ? err.response.data.message : "Error while updating expense");
+        console.log(err.response.data.message ? err.response.data.message : "Error while adding stock", err);
+        setErrors(err.response.data.message ? err.response.data.message : "Error while adding stock");
       });
   };
 
@@ -71,7 +83,7 @@ function EditExpensesModal({ onClose, callback, id, name,cost, date }) {
             className="w-full h-full flex flex-col items-center justify-center p-4"
           >
             <span className="mb-4 text-xl font-bold text-primary-light dark:text-accent-gray">
-              Edit Expense Details
+              Enter Stock Details
             </span>
             {/* name */}
             <div className="relative w-full mt-2 md:mt-4">
@@ -89,28 +101,49 @@ function EditExpensesModal({ onClose, callback, id, name,cost, date }) {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Enter expense"
+                placeholder="Enter name of stock"
                 autoFocus={true}
               />
             </div>
 
-            {/* cost */}
+            {/* type */}
             <div className="relative w-full mt-2 md:mt-4">
               <label
                 className="block text-start text-primary-light dark:text-accent-gray text-sm font-bold mb-2"
-                htmlFor="cost"
+                htmlFor="type"
               >
-                Cost
+                Category of Stock
+              </label>
+              <select
+                name="type"
+                id="type"
+                required
+                value={formData.type}
+                onChange={handleChange}
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+              >
+                <option value="">Choose category of stock</option>
+                {categories.map((c,i) => <option key={i} value={c}>{c}</option>)}
+              </select>
+            </div>
+
+            {/* quantity */}
+            <div className="relative w-full mt-2 md:mt-4">
+              <label
+                className="block text-start text-primary-light dark:text-accent-gray text-sm font-bold mb-2"
+                htmlFor="quantity"
+              >
+                Quantity
               </label>
               <input
                 className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
-                id="cost"
+                id="quantity"
                 required
-                name="cost"
-                type="number"
-                value={formData.cost}
+                name="quantity"
+                type="text"
+                value={formData.quantity}
                 onChange={handleChange}
-                placeholder="Enter cost eg. 2000, 1000 etc"
+                placeholder="eg 2 bags, 3 sacks, 4 pipes, 6 strings etc"
               />
             </div>
 
@@ -142,7 +175,7 @@ function EditExpensesModal({ onClose, callback, id, name,cost, date }) {
               }`}
               disabled={loading}
             >
-              {loading ? "Updating..." : "Update Expense"}
+              {loading ? "Adding Stock..." : "Add Stock"}
             </button>
           </form>
           {/* errors */}
@@ -155,4 +188,4 @@ function EditExpensesModal({ onClose, callback, id, name,cost, date }) {
   );
 }
 
-export default EditExpensesModal;
+export default StockModal;

@@ -2,13 +2,16 @@
 import { FaLaptop, FaMoon, FaSun } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
 import axios, { Axios } from 'axios';
+import DeleteModal from './components/DeleteModal';
 
 function TopAppBar({ theme, toggleTheme }) {
   const [toggleProfile, setToggleProfile] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [user, setUser] = useState(null);
   const userId = localStorage.getItem('smartId');
 
   const handleToggleProfile = () => setToggleProfile(!toggleProfile);
+  const handleToggleDeleteModal = () => setOpenDeleteModal(!openDeleteModal);
 
   const handleThemeChange = (selectedTheme) => {
     toggleTheme(selectedTheme); 
@@ -16,7 +19,7 @@ function TopAppBar({ theme, toggleTheme }) {
 
   const fetchUser = async () => {  
       try{
-          const res = await axios.get(`http://localhost:10000/users/${userId}`);
+          const res = await axios.get(`https://oyster-app-k8jcp.ondigitalocean.app/users/${userId}`);
           if(res.data.success === true){
               setUser(res.data.data);
           } else{
@@ -27,6 +30,22 @@ function TopAppBar({ theme, toggleTheme }) {
         console.error(err);
       }
   }
+
+  const deleteAccount = async () => {
+    try{
+      const res = await axios.delete(`https://oyster-app-k8jcp.ondigitalocean.app/users/${localStorage.getItem('smartId')}`);
+      if(res.data.success === true){
+          localStorage.removeItem('smartId');
+          localStorage.removeItem('smartUsername');
+          localStorage.removeItem('smartToken');
+          window.location.reload();
+      } else{
+          console.error('Failed to delete account', res.data.message);
+      }
+  }catch(err){
+    console.error(err);
+  }
+  }
   
   useEffect(() => {
     fetchUser();
@@ -34,7 +53,7 @@ function TopAppBar({ theme, toggleTheme }) {
 
   const handleLogout = async () => {
     try{
-      const res = await axios.post('http://localhost:10000/auth/logout');
+      const res = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/auth/logout');
       if(res){
         localStorage.removeItem('smartId');
         localStorage.removeItem('smartUsername');
@@ -50,6 +69,7 @@ function TopAppBar({ theme, toggleTheme }) {
 
   return (
     <div>
+      {openDeleteModal && <DeleteModal onClose={handleToggleDeleteModal} confirm={deleteAccount} />}
       <nav className="fixed w-screen h-auto flex items-center justify-between bg-gray-700 dark:bg-primary-dark text-white dark:text-gray-200 shadow-lg py-1 lg:py-0 z-20">
         <span className="flex items-center font-bold text-2xl">
           <img src='/logo-dark.png' alt='logo' className='w-12 h-12 lg:w-16 lg:h-16' />
@@ -95,11 +115,11 @@ function TopAppBar({ theme, toggleTheme }) {
               </span>
             </span>
 
-            <button className={`mt-2 text-sm w-full dark:bg-primary-dark hover:bg-primary-glass ${!toggleProfile && 'hidden'}`}>
-              Change Profile
-            </button>
             <button onClick={handleLogout} className={`mt-2 text-sm w-full border-2 dark:border-primary-light hover:bg-primary-light hover:text-primary-dark transition-all ease-in-out duration-700 ${!toggleProfile && 'hidden'}`}>
               {localStorage.getItem('smartId') ? 'Logout' : 'Login'}
+            </button>
+            <button onClick={handleToggleDeleteModal} className={`mt-2 text-sm w-full dark:bg-red-900 hover:bg-primary-glass ${!toggleProfile && 'hidden'}`}>
+              Delete Account
             </button>
           </span>
         </div>

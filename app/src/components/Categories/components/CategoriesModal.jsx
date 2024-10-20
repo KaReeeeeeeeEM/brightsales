@@ -33,7 +33,7 @@ function CategoriesModal({ onClose, callback }) {
     };
 
     await axios
-      .post("http://localhost:10000/categories", finalData)
+      .post("https://oyster-app-k8jcp.ondigitalocean.app/categories", finalData)
       .then(async (res) => {
         const { success, message } = res.data;
         if (success && success === true) {
@@ -43,7 +43,7 @@ function CategoriesModal({ onClose, callback }) {
             seller: localStorage.getItem('smartId'),
             details: `Included ${finalData.name} in the categories list.`
           }
-          const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
+          const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
           if(activityUpdate.data.success === true){
                 setFormData({
                   name: "",
@@ -88,7 +88,7 @@ function CategoriesModal({ onClose, callback }) {
                 Category Name
               </label>
               <input
-                className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
                 id="name"
                 required
                 name="name"

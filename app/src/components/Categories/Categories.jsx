@@ -13,9 +13,9 @@ function Categories() {
 
   const fetchCategories = async () => {
     await axios
-      .get("http://localhost:10000/categories")
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/categories")
       .then(res => {
-        setCategories(res.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')).reverse());
+        setCategories(res.data.data.filter(f => f.seller && f.seller._id === localStorage.getItem('smartId')).reverse());
       })
       .catch((err) => console.log(err));
   };
@@ -56,9 +56,16 @@ function Categories() {
         <span>
           <button
             onClick={toggleOpenModal}
-            className="flex items-center text-sm md:text-md bg-accent-grayShade dark:bg-primary-glass"
+            className="hidden md:flex items-center text-sm md:text-md bg-accent-grayShade dark:bg-primary-glass"
           >
             New Category
+            <FaPlus className="ml-2" />
+          </button>
+          <button
+            onClick={toggleOpenModal}
+            className="flex md:hidden items-center text-sm md:text-md bg-accent-grayShade dark:bg-primary-glass"
+          >
+            New
             <FaPlus className="ml-2" />
           </button>
         </span>

@@ -36,7 +36,7 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
     };
 
     await axios
-      .put(`http://localhost:10000/sales/${id}`, finalData)
+      .put(`https://oyster-app-k8jcp.ondigitalocean.app/sales/${id}`, finalData)
       .then((res) => {
         const { success, message } = res.data;
         if (success && success === true) {
@@ -89,7 +89,7 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
                 value={formData.stock}
                 onChange={handleChange}
                 autoFocus={true}
-                 className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                 className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
               >
                 <option value="">Choose stock sold</option>
                 {stock.length > 0 && stock.map(s => <option  key={s._id} value={s._id}>{s.name}</option>)}
@@ -105,7 +105,7 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
                 amount
               </label>
               <input
-                className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
                 id="amount"
                 required
                 name="amount"
@@ -125,7 +125,7 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
                 Select Date
               </label>
               <input
-                className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
                 id="date"
                 required
                 name="date"

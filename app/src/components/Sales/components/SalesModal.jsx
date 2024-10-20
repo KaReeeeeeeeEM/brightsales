@@ -38,7 +38,7 @@ function SalesModal({ onClose, callback, stock }) {
     };
 
     await axios
-      .post("http://localhost:10000/sales", finalData)
+      .post("https://oyster-app-k8jcp.ondigitalocean.app/sales", finalData)
       .then(async (res) => {
         const { success, message } = res.data;
         const stockName = allStock.length > 0 && allStock.filter(s => s._id === formData.stock)[0].name;
@@ -49,7 +49,7 @@ function SalesModal({ onClose, callback, stock }) {
             seller: localStorage.getItem('smartId'),
             details: `Sold Tshs ${finalData.amount}/= worth of ${stockName}`
           }
-          const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
+          const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
           if(activityUpdate.data.success === true){
                 setFormData({
                   name: "",
@@ -102,10 +102,10 @@ function SalesModal({ onClose, callback, stock }) {
                 value={formData.stock}
                 onChange={handleChange}
                 autoFocus={true}
-                 className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
               >
                 <option value="">What stock did you sell?</option>
-                {stock.length > 0 && stock.map(s => <option  key={s._id} value={s._id}>{s.name}</option>)}
+                {stock.length > 0 && stock.map(s => <option  key={s._id} value={s._id}>{s.name} ({s.type})</option>)}
               </select>
             </div>
 
@@ -118,7 +118,7 @@ function SalesModal({ onClose, callback, stock }) {
                 Earnings
               </label>
               <input
-                className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
                 id="amount"
                 required
                 name="amount"
@@ -138,7 +138,7 @@ function SalesModal({ onClose, callback, stock }) {
                 Select Date
               </label>
               <input
-                className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
                 id="date"
                 required
                 name="date"

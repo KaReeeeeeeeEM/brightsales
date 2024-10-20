@@ -48,7 +48,7 @@ function Register() {
 
     try {
       const res = await axios.post(
-        "http://localhost:10000/auth/v2/register",
+        "https://oyster-app-k8jcp.ondigitalocean.app/auth/v2/register",
         formData
       );
       if (res.data.success === true) {
@@ -90,7 +90,7 @@ function Register() {
         password: formData.password,
       };
       const res = await axios.post(
-        "http://localhost:10000/auth/v2/login",
+        "https://oyster-app-k8jcp.ondigitalocean.app/auth/v2/login",
         loginCredentials
       );
 
@@ -136,7 +136,7 @@ function Register() {
               Username
             </label>
             <input
-              className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+              className="appearance-none bg-accent-grayShade dark:bg-primary-glass  border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
               id="username"
               name="username"
               type="username"
@@ -156,7 +156,7 @@ function Register() {
                 Phone
               </label>
               <input
-                className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass  border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
                 id="phone"
                 name="phone"
                 type="tel"
@@ -177,7 +177,7 @@ function Register() {
                 Email
               </label>
               <input
-                className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass  border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
                 id="email"
                 name="email"
                 type="email"
@@ -202,7 +202,7 @@ function Register() {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+              className="appearance-none bg-accent-grayShade dark:bg-primary-glass  border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
             />
             <div
               className="absolute top-2/3 right-4 transform -translate-y-1/2 cursor-pointer text-gray-500"
@@ -227,7 +227,7 @@ function Register() {
                 placeholder="Confirm password"
                 value={formData.confirm}
                 onChange={handleChange}
-                className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass  border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
               />
               <div
                 className="absolute top-2/3 right-4 transform -translate-y-1/2 cursor-pointer text-gray-500"

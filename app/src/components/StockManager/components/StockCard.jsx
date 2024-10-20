@@ -29,7 +29,7 @@ function StockCard({ id, name, type, quantity, categories, seller, date, created
   };
 
   const deleteStock = async () => {
-    await axios.delete(`http://localhost:10000/stock/${id}`)
+    await axios.delete(`https://oyster-app-k8jcp.ondigitalocean.app/stock/${id}`)
     .then(
       async res => {
         if(res.data.success === true){
@@ -38,7 +38,7 @@ function StockCard({ id, name, type, quantity, categories, seller, date, created
               seller: localStorage.getItem('smartId'),
               details: `Removed ${quantity} of ${name} from the store`
             }
-            const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
+            const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
             if(activityUpdate) callback();
         } else {
           console.log('Error deleting stock', res.data.message);

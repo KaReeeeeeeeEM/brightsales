@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import { FaBoxOpen, FaCalendar, FaChartBar, FaCoins, FaPlus } from "react-icons/fa";
+import { FaChartBar, FaPlus } from "react-icons/fa";
 import SalesCard from "./components/SalesCard";
 import axios from "axios";
 import SalesModal from "./components/SalesModal";
@@ -8,45 +8,48 @@ import SalesModal from "./components/SalesModal";
 function Sales() {
   const [sales, setSales] = useState([]);
   const [stock, setStock] = useState([]);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
   const [openSalesModal, setOpenSalesModal] = useState(false);
 
   const fetchSales = async () => {
     await axios
-      .get("http://localhost:10000/sales")
-      .then(res => {
-        console.log(res.data.data)
-        setSales(res.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')).reverse());
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/sales")
+      .then((res) => {
+        setSales(
+          res.data.data
+            .filter(
+              (f) =>
+                f.seller && f.seller._id === localStorage.getItem("smartId")
+            )
+            .reverse()
+        );
       })
       .catch((err) => console.log(err));
   };
 
   const fetchStock = async () => {
     await axios
-      .get("http://localhost:10000/stock")
-      .then(res => {
-        console.log(res.data.data)
-        setStock(res.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')).reverse());
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/stock")
+      .then((res) => {
+        setStock(
+          res.data.data
+            .filter(
+              (f) =>
+                f.seller && f.seller._id === localStorage.getItem("smartId")
+            )
+            .filter(
+              (s) =>
+                (s.type.toLowerCase().trim() !== "capital" ||
+                  !s.type.toLowerCase().trim().includes("capital")) &&
+                (s.type.toLowerCase().trim() !== "mtaji" ||
+                  !s.type.toLowerCase().trim().includes("mtaji")) &&
+                (s.type.toLowerCase().trim() !== "kianzio" ||
+                  !s.type.toLowerCase().trim().includes("kianzio"))
+            )
+            .reverse()
+        );
       })
       .catch((err) => console.log(err));
   };
-
-  // Function to filter stock based on the date range
-  const filteredExpenses = sales.filter((sale) => {
-    const saleCreatedAt = new Date(sale.date);
-    const start = startDate ? new Date(startDate) : null;
-    const end = endDate ? new Date(endDate) : null;
-
-    if (start && end) {
-      return saleCreatedAt >= start && saleCreatedAt <= end;
-    } else if (start) {
-      return saleCreatedAt >= start;
-    } else if (end) {
-      return saleCreatedAt <= end;
-    }
-    return true;
-  });
 
   useEffect(() => {
     fetchSales();
@@ -58,13 +61,25 @@ function Sales() {
   return (
     <div className="w-full h-[100vh]">
       {openSalesModal && (
-        <SalesModal onClose={toggleOpenModal} callback={fetchSales} stock={stock} />
+        <SalesModal
+          onClose={toggleOpenModal}
+          callback={fetchSales}
+          stock={stock}
+        />
       )}
       {/* title */}
       <span className="w-full mt-2 md:mt-0 flex items-center justify-between text-primary-dark dark:text-primary-light font-bold text-lg md:text-xl lg:text-2xl">
         <span className="flex items-center">
           <FaChartBar className="mr-2" />
-          Sales (<span className="text-primary-dark dark:text-accent-gray">{sales.length}</span>)
+          Sales (
+          <span className="text-primary-dark dark:text-accent-gray">
+            {sales && sales.reduce((a, e) => (a += e.amount), 0) > 1000000
+              ? sales.reduce((a, e) => (a += e.amount), 0) / 1000000 + "M"
+              : sales.reduce((a, e) => (a += e.amount), 0) > 1000
+              ? sales.reduce((a, e) => (a += e.amount), 0) / 1000 + "k"
+              : sales.reduce((a, e) => (a += e.amount), 0)}
+          </span>
+          )
         </span>
         <span>
           <button
@@ -89,8 +104,8 @@ function Sales() {
               id={s._id}
               key={s._id}
               stock={stock}
-              stockSelected={s.stock ? s.stock : 'Stock removed'}
-              name={s.stock ? s.stock.name : 'Stock name not present'}
+              stockSelected={s.stock ? s.stock : "Stock removed"}
+              name={s.stock ? s.stock.name : "Stock name not present"}
               amount={s.amount}
               date={s.date}
               seller={s.seller}

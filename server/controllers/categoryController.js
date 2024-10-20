@@ -18,7 +18,7 @@ exports.createCategory = async (req,res) => {
     try{
         const existingCategory = await Category.findOne({name: name})
         console.log(existingCategory)
-        if(existingCategory) return res.status(500).json({success: false, message: 'Category already exists!' });
+        if(existingCategory && existingCategory.seller === seller) return res.status(500).json({success: false, message: 'Category already exists!' });
 
         const payload = {
             name: name,

@@ -32,7 +32,7 @@ function EditCategoriesModal({ onClose, callback, id, name }) {
     };
 
     await axios
-      .put(`http://localhost:10000/categories/${id}`, finalData)
+      .put(`https://oyster-app-k8jcp.ondigitalocean.app/categories/${id}`, finalData)
       .then((res) => {
         const { success, message } = res.data;
         if (success && success === true) {
@@ -76,7 +76,7 @@ function EditCategoriesModal({ onClose, callback, id, name }) {
                 Category
               </label>
               <input
-                className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
                 id="name"
                 required
                 name="name"

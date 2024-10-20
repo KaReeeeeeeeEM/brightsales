@@ -37,17 +37,17 @@ function StockModal({ onClose, callback, categories }) {
     };
 
     await axios
-      .post("http://localhost:10000/stock", finalData)
+      .post("https://oyster-app-k8jcp.ondigitalocean.app/stock", finalData)
       .then(async (res) => {
         const { success, message } = res.data;
         if (success && success === true) {
           setMessage(res.data.message);
           const newActivity = {
-            name: 'Stock Added',
+            name: 'Stock Included',
             seller: localStorage.getItem('smartId'),
             details: `Added ${finalData.quantity} of ${finalData.name}`
           }
-          const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
+          const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
           if(activityUpdate.data.success === true){
                 setFormData({
                   name: "",
@@ -94,7 +94,7 @@ function StockModal({ onClose, callback, categories }) {
                 Name
               </label>
               <input
-                className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
                 id="name"
                 name="name"
                 type="text"
@@ -120,9 +120,10 @@ function StockModal({ onClose, callback, categories }) {
                 required
                 value={formData.type}
                 onChange={handleChange}
-                className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
               >
                 <option value="">Choose category of stock</option>
+                <option value="Capital">Capital (mtaji)</option>
                 {categories.map((c,i) => <option key={i} value={c}>{c}</option>)}
               </select>
             </div>
@@ -136,7 +137,7 @@ function StockModal({ onClose, callback, categories }) {
                 Quantity
               </label>
               <input
-                className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
                 id="quantity"
                 required
                 name="quantity"
@@ -156,7 +157,7 @@ function StockModal({ onClose, callback, categories }) {
                 Select Date
               </label>
               <input
-                className="appearance-none bg-accent-grayShade border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
                 id="date"
                 required
                 name="date"

@@ -36,7 +36,7 @@ ChartJS.register(
 );
 
 function DashboardContent() {
-  const [score, setScore] = useState(0);
+  const [allStock, setAllStock] = useState([]);
   const [stockCount, setStockCount] = useState(0);
   const [totalSales, setTotalSales] = useState(0);
   const [weeklySales, setWeeklySales] = useState(0);
@@ -46,13 +46,13 @@ function DashboardContent() {
 
   const lineData = {
     labels: [
+      "Sunday",
       "Monday",
       "Tuesday",
       "Wednesday",
       "Thursday",
       "Friday",
       "Saturday",
-      "Sunday",
     ],
     datasets: [
       {
@@ -132,9 +132,16 @@ function DashboardContent() {
 
   const fetchActivities = async () => {
     await axios
-      .get("http://localhost:10000/activity")
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/activity")
       .then((res) => {
-        setActivities(res.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')).reverse());
+        setActivities(
+          res.data.data
+            .filter(
+              (f) =>
+                f.seller && f.seller._id === localStorage.getItem("smartId")
+            )
+            .reverse()
+        );
       })
       .catch((err) => {
         console.log({
@@ -146,30 +153,55 @@ function DashboardContent() {
 
   const fetchStock = async () => {
     await axios
-      .get("http://localhost:10000/stock")
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/stock")
       .then((res) => {
-        setStockCount(res.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')).length);
+        setAllStock(
+          res.data.data.filter(
+            (f) => f.seller && f.seller._id === localStorage.getItem("smartId")
+          )
+        );
+        setStockCount(
+          res.data.data.filter(
+            (f) => f.seller && f.seller._id === localStorage.getItem("smartId")
+          ).length
+        );
       })
       .catch((err) => console.log(err));
   };
 
   const fetchExpenses = async () => {
     await axios
-      .get("http://localhost:10000/expenses")
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/expenses")
       .then((res) => {
-        setTotalExpenses(res.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')).reduce((a, e) => (a += e.cost), 0));
+        setTotalExpenses(
+          res.data.data
+            .filter(
+              (f) =>
+                f.seller && f.seller._id === localStorage.getItem("smartId")
+            )
+            .reduce((a, e) => (a += e.cost), 0)
+        );
       })
       .catch((err) => console.log(err));
   };
 
   const fetchSales = async () => {
     await axios
-      .get("http://localhost:10000/sales")
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/sales")
       .then((res) => {
-        setTotalSales(res.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')).reduce((a, s) => (a += s.amount), 0));
+        setTotalSales(
+          res.data.data
+            .filter(
+              (f) =>
+                f.seller && f.seller._id === localStorage.getItem("smartId")
+            )
+            .reduce((a, s) => (a += s.amount), 0)
+        );
 
         // filter weekly sales from all sales
-        const allSales = res.data.data.filter(f => f.seller._id === localStorage.getItem('smartId'));
+        const allSales = res.data.data.filter(
+          (f) => f.seller && f.seller._id === localStorage.getItem("smartId")
+        );
         allSales.filter((s) => {
           const fullSaleDate = new Date(s.date);
 
@@ -203,21 +235,21 @@ function DashboardContent() {
           if (parseInt(salesYear) === parseInt(currentYear))
             parseInt(salesMonth) === parseInt(currentMonth)
               ? difference === -1
-                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                ? (allWeeksSales[saleDay] += s.amount * 0.5)
                 : difference === 0
-                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                ? (allWeeksSales[saleDay] += s.amount * 0.5)
                 : difference === 1
-                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                ? (allWeeksSales[saleDay] += s.amount * 0.5)
                 : difference === 2
-                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                ? (allWeeksSales[saleDay] += s.amount * 0.5)
                 : difference === 3
-                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                ? (allWeeksSales[saleDay] += s.amount * 0.5)
                 : difference === 4
-                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                ? (allWeeksSales[saleDay] += s.amount * 0.5)
                 : difference === 5
-                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                ? (allWeeksSales[saleDay] += s.amount * 0.5)
                 : difference === 6
-                ? (allWeeksSales[saleDay - 1] += s.amount * 0.5)
+                ? (allWeeksSales[saleDay] += s.amount * 0.5)
                 : ""
               : "";
         });
@@ -254,7 +286,17 @@ function DashboardContent() {
           </span>
           <span className="mx-6 mt-4">
             <span className="font-bold text-4xl text-primary-dark dark:text-primary-light">
-              {stockCount}
+              {allStock.reduce(
+                (a, s) =>
+                  (a +=
+                    (s.type.toLowerCase().trim() !== "capital" || !s.type.toLowerCase().trim().includes('capital')) &&
+                    (s.type.toLowerCase().trim() !== "mtaji" || !s.type.toLowerCase().trim().includes('mtaji')) &&
+                    (s.type.toLowerCase().trim() !== "kianzio" || !s.type.toLowerCase().trim().includes('kianzio')) &&
+                    (isNaN(s.quantity)
+                      ? parseInt(s.quantity.split(" ").filter((q) => !isNaN(q)))
+                      : parseInt(s.quantity))),
+                0
+              )}
             </span>
             <span className="text-md text-accent-darkGray ml-1">
               {stockCount === 1 ? "item" : "items"}
@@ -293,17 +335,17 @@ function DashboardContent() {
               <FaChartBar className="absolute top-0 left-0 w-full h-full p-2 text-accent-gray dark:text-primary-light group-hover:text-[#ccc] z-10" />
             </span>
             <span className="ml-2 text-primary-dark font-bold dark:text-accent-gray text-sm">
-              Weekly Sales
+              Today's Sales
             </span>
           </span>
           <span className="mx-6 mt-4">
             <span className="text-lg text-accent-darkGray mr-1">Tshs</span>
             <span className="font-bold text-4xl text-primary-dark dark:text-primary-light">
-              {allWeeksSales.reduce((a, s) => (a += s), 0) > 1000000
-                ? allWeeksSales.reduce((a, s) => (a += s), 0) / 1000000 + "M"
-                : allWeeksSales.reduce((a, s) => (a += s), 0) > 1000
-                ? allWeeksSales.reduce((a, s) => (a += s), 0) / 1000 + "k"
-                : allWeeksSales.reduce((a, s) => (a += s), 0)}
+              {allWeeksSales[new Date().getDay()] > 1000000
+                ? allWeeksSales[new Date().getDay()] / 1000000 + "M"
+                : allWeeksSales[new Date().getDay()] > 1000
+                ? allWeeksSales[new Date().getDay()] / 1000 + "k"
+                : allWeeksSales[new Date().getDay()]}
             </span>
           </span>
         </div>
@@ -344,7 +386,7 @@ function DashboardContent() {
           <Doughnut data={doughnutData} options={doughnutOptions} />
           <span className="absolute flex flex-col items-center justify-center mx-auto mt-16 w-16 h-16">
             <span
-              className={`text-sm font-bold ${
+              className={`text-xs md:text-sm font-bold ${
                 totalSales / totalExpenses < 1
                   ? "text-red-600"
                   : totalSales / totalExpenses === 1
@@ -352,17 +394,21 @@ function DashboardContent() {
                   : "text-green-600"
               }`}
             >
-              {totalSales !== 0 && totalExpenses !== 0 &&  (totalSales / totalExpenses < 1
-                ? "Weak"
-                : totalSales / totalExpenses === 1
-                ? "Balanced"
-                : totalSales / totalExpenses > 1 &&
-                  totalSales / totalExpenses < 3
-                ? "Good"
-                : "Excellent")}
+              {totalSales !== 0 &&
+                totalExpenses !== 0 &&
+                (totalSales / totalExpenses < 1
+                  ? "Weak"
+                  : totalSales / totalExpenses === 1
+                  ? "Balanced"
+                  : totalSales / totalExpenses > 1 &&
+                    totalSales / totalExpenses < 3
+                  ? "Good"
+                  : "Excellent")}
             </span>
-            <span className="text-primary-light text-lg font-bold">
-              {totalSales !== 0 && totalExpenses !== 0 && Math.round((totalSales * 100) / totalExpenses) / 100}
+            <span className="text-primary-light text-sm md:text-lg font-bold">
+              {totalSales !== 0 &&
+                totalExpenses !== 0 &&
+                Math.round((totalSales * 100) / totalExpenses) / 100}
             </span>
           </span>
         </div>

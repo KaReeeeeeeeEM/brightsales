@@ -14,29 +14,16 @@ function ExpenseTracker() {
 
   const fetchExpenses = async () => {
     await axios
-      .get("http://localhost:10000/expenses")
-      .then(res => {
-        console.log(res.data.data)
-        setExpenses(res.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')).reverse());
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/expenses")
+      .then((res) => {
+        setExpenses(
+          res.data.data
+            .filter((f) => f.seller && f.seller._id === localStorage.getItem("smartId"))
+            .reverse()
+        );
       })
       .catch((err) => console.log(err));
   };
-
-  // Function to filter stock based on the date range
-  const filteredExpenses = expenses.filter((stock) => {
-    const stockCreatedAt = new Date(stock.date);
-    const start = startDate ? new Date(startDate) : null;
-    const end = endDate ? new Date(endDate) : null;
-
-    if (start && end) {
-      return stockCreatedAt >= start && stockCreatedAt <= end;
-    } else if (start) {
-      return stockCreatedAt >= start;
-    } else if (end) {
-      return stockCreatedAt <= end;
-    }
-    return true;
-  });
 
   useEffect(() => {
     fetchExpenses();
@@ -51,16 +38,43 @@ function ExpenseTracker() {
       )}
       {/* title */}
       <span className="w-full mt-2 md:mt-0 flex items-center justify-between text-primary-dark dark:text-primary-light font-bold text-lg md:text-xl lg:text-2xl">
-        <span className="flex items-center">
+        <span className="hidden md:flex items-center">
           <FaCoins className="mr-2" />
-          Expense Tracker (<span className="text-primary-dark dark:text-accent-gray">{expenses.length}</span>)
+          Expense Tracker (
+          <span className="hidden md:block text-primary-dark dark:text-accent-gray">
+            {expenses && expenses.reduce((a, e) => (a += e.cost), 0) > 1000000
+              ? expenses.reduce((a, e) => (a += e.cost), 0) / 1000000 + "M"
+              : expenses.reduce((a, e) => (a += e.cost), 0) > 1000
+              ? expenses.reduce((a, e) => (a += e.cost), 0) / 1000 + "k"
+              : expenses.reduce((a, e) => (a += e.cost), 0)}
+          </span>
+          )
+        </span>
+        <span className="flex md:hidden items-center">
+          <FaCoins className="mr-2" />
+          Expenses (
+          <span className="block md:hidden text-primary-dark dark:text-accent-gray">
+            {expenses && expenses.reduce((a, e) => (a += e.cost), 0) > 1000000
+              ? expenses.reduce((a, e) => (a += e.cost), 0) / 1000000 + "M"
+              : expenses.reduce((a, e) => (a += e.cost), 0) > 1000
+              ? expenses.reduce((a, e) => (a += e.cost), 0) / 1000 + "k"
+              : expenses.reduce((a, e) => (a += e.cost), 0)}
+          </span>
+          )
         </span>
         <span>
           <button
             onClick={toggleOpenModal}
-            className="flex items-center text-sm md:text-md bg-accent-grayShade dark:bg-primary-glass"
+            className="hidden md:flex items-center text-sm md:text-md bg-accent-grayShade dark:bg-primary-glass"
           >
             Record Expenses
+            <FaPlus className="ml-2" />
+          </button>
+          <button
+            onClick={toggleOpenModal}
+            className="flex md:hidden items-center text-sm md:text-md bg-accent-grayShade dark:bg-primary-glass"
+          >
+            Add
             <FaPlus className="ml-2" />
           </button>
         </span>

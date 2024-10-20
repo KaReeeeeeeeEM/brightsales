@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { FaFilter } from "react-icons/fa";
 import SalesCard from "../Sales/components/SalesCard";
 import CategoriesCard from "../Categories/components/CategoriesCard";
-import StockCard from "../StockManager/components/StockCard";
+import StockCard from "./components/StockCard";
 import ExpenseCard from "../ExpenseTracker/components/ExpenseCard";
 
 function SuperFilter() {
@@ -19,15 +19,48 @@ function SuperFilter() {
   const [categories, setCategories] = useState([]);
 
   const fetchAllTypes = async () => {
-    const allStock = await axios.get("http://localhost:10000/stock");
-    const allSales = await axios.get("http://localhost:10000/sales");
-    const allCategories = await axios.get("http://localhost:10000/categories");
-    const allExpenses = await axios.get("http://localhost:10000/expenses");
+    const allStock = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/stock");
+    const allSales = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/sales");
+    const allCategories = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/categories");
+    const allExpenses = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/expenses");
 
-    setStock(allStock.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')));
-    setSales(allSales.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')));
-    setCategories(allCategories.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')));
-    setExpenses(allExpenses.data.data.filter(f => f.seller._id === localStorage.getItem('smartId')));
+    setStock(
+      allStock.data.data
+        .filter(
+          (f) => f.seller && f.seller._id === localStorage.getItem("smartId")
+        )
+        .filter(
+          (s) =>
+            (s.type.toLowerCase().trim() !== "capital" ||
+              !s.type.toLowerCase().trim().includes("capital")) &&
+            (s.type.toLowerCase().trim() !== "mtaji" ||
+              !s.type.toLowerCase().trim().includes("mtaji")) &&
+            (s.type.toLowerCase().trim() !== "kianzio" ||
+              !s.type.toLowerCase().trim().includes("kianzio"))
+        )
+        .reverse()
+    );
+    setSales(
+      allSales.data.data
+        .filter(
+          (f) => f.seller && f.seller._id === localStorage.getItem("smartId")
+        )
+        .reverse()
+    );
+    setCategories(
+      allCategories.data.data
+        .filter(
+          (f) => f.seller && f.seller._id === localStorage.getItem("smartId")
+        )
+        .reverse()
+    );
+    setExpenses(
+      allExpenses.data.data
+        .filter(
+          (f) => f.seller && f.seller._id === localStorage.getItem("smartId")
+        )
+        .reverse()
+    );
   };
 
   useEffect(() => {
@@ -110,6 +143,256 @@ function SuperFilter() {
           Search Results for{" "}
           <span className="mt-4 text-md lg:text-lg font-semibold text-primary-dark dark:text-accent-gray italic">
             {type}
+
+            {/* total for stock */}
+            {type === "stock" && (
+              <span className="text-primary-dark dark:text-accent-gray ml-1">
+                (
+                {stock &&
+                (keyword === ""
+                  ? stock
+                  : stock.filter(
+                      (st) =>
+                        st !== null &&
+                        st.name.toLowerCase().trim().includes(keyword)
+                    )
+                ).reduce(
+                  (a, s) =>
+                    (a += isNaN(s.quantity)
+                      ? parseInt(s.quantity.split(" ").filter((q) => !isNaN(q)))
+                      : s),
+                  0
+                ) > 1000000
+                  ? (keyword === ""
+                      ? stock
+                      : stock.filter(
+                          (st) =>
+                            st !== null &&
+                            st.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).reduce(
+                      (a, s) =>
+                        (a += isNaN(s.quantity)
+                          ? parseInt(
+                              s.quantity.split(" ").filter((q) => !isNaN(q))
+                            )
+                          : s),
+                      0
+                    ) /
+                      1000000 +
+                    "M"
+                  : (keyword === ""
+                      ? stock
+                      : stock.filter(
+                          (st) =>
+                            st !== null &&
+                            st.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).reduce(
+                      (a, s) =>
+                        (a += isNaN(s.quantity)
+                          ? parseInt(
+                              s.quantity.split(" ").filter((q) => !isNaN(q))
+                            )
+                          : s),
+                      0
+                    ) > 1000
+                  ? (keyword === ""
+                      ? stock
+                      : stock.filter(
+                          (st) =>
+                            st !== null &&
+                            st.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).reduce(
+                      (a, s) =>
+                        (a += isNaN(s.quantity)
+                          ? parseInt(
+                              s.quantity.split(" ").filter((q) => !isNaN(q))
+                            )
+                          : s),
+                      0
+                    ) /
+                      1000 +
+                    "k"
+                  : (keyword === ""
+                      ? stock
+                      : stock.filter(
+                          (st) =>
+                            st !== null &&
+                            st.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).reduce(
+                      (a, s) =>
+                        (a += isNaN(s.quantity)
+                          ? parseInt(
+                              s.quantity.split(" ").filter((q) => !isNaN(q))
+                            )
+                          : s),
+                      0
+                    )}
+                )
+              </span>
+            )}
+
+            {/* total for sales */}
+            {type === "sales" && (
+              <span className="text-primary-dark dark:text-accent-gray ml-1">
+                (
+                {sales &&
+                (keyword === ""
+                  ? sales
+                  : sales.filter(
+                      (st) =>
+                        st.stock !== null &&
+                        st.stock.name.toLowerCase().trim().includes(keyword)
+                    )
+                ).reduce((a, e) => (a += e.amount), 0) > 1000000
+                  ? (keyword === ""
+                      ? sales
+                      : sales.filter(
+                          (st) =>
+                            st.stock !== null &&
+                            st.stock.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).reduce((a, e) => (a += e.amount), 0) /
+                      1000000 +
+                    "M"
+                  : (keyword === ""
+                      ? sales
+                      : sales.filter(
+                          (st) =>
+                            st.stock !== null &&
+                            st.stock.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).reduce((a, e) => (a += e.amount), 0) > 1000
+                  ? (keyword === ""
+                      ? sales
+                      : sales.filter(
+                          (st) =>
+                            st.stock !== null &&
+                            st.stock.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).reduce((a, e) => (a += e.amount), 0) /
+                      1000 +
+                    "k"
+                  : (keyword === ""
+                      ? sales
+                      : sales.filter(
+                          (st) =>
+                            st.stock !== null &&
+                            st.stock.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).reduce((a, e) => (a += e.amount), 0)}
+                )
+              </span>
+            )}
+
+            {/* total for expenses */}
+            {type === "expenses" && (
+              <span className="text-primary-dark dark:text-accent-gray ml-1">
+                (
+                {expenses &&
+                (keyword === ""
+                  ? expenses
+                  : expenses.filter(
+                      (st) =>
+                        st !== null &&
+                        st.name.toLowerCase().trim().includes(keyword)
+                    )
+                ).reduce((a, e) => (a += e.cost), 0) > 1000000
+                  ? (keyword === ""
+                      ? expenses
+                      : expenses.filter(
+                          (st) =>
+                            st !== null &&
+                            st.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).reduce((a, e) => (a += e.cost), 0) /
+                      1000000 +
+                    "M"
+                  : (keyword === ""
+                      ? expenses
+                      : expenses.filter(
+                          (st) =>
+                            st !== null &&
+                            st.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).reduce((a, e) => (a += e.cost), 0) > 1000
+                  ? (keyword === ""
+                      ? expenses
+                      : expenses.filter(
+                          (st) =>
+                            st !== null &&
+                            st.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).reduce((a, e) => (a += e.cost), 0) /
+                      1000 +
+                    "k"
+                  : (keyword === ""
+                      ? expenses
+                      : expenses.filter(
+                          (st) =>
+                            st !== null &&
+                            st.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).reduce((a, e) => (a += e.cost), 0)}
+                )
+              </span>
+            )}
+
+            {/* total for categories */}
+            {type === "category" && (
+              <span className="text-primary-dark dark:text-accent-gray ml-1">
+                (
+                {categories &&
+                (keyword === ""
+                  ? categories
+                  : categories.filter(
+                      (st) =>
+                        st !== null &&
+                        st.name.toLowerCase().trim().includes(keyword)
+                    )
+                ).length > 1000000
+                  ? (keyword === ""
+                      ? categories
+                      : categories.filter(
+                          (st) =>
+                            st !== null &&
+                            st.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).length /
+                      1000000 +
+                    "M"
+                  : (keyword === ""
+                      ? categories
+                      : categories.filter(
+                          (st) =>
+                            st !== null &&
+                            st.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).length > 1000
+                  ? (keyword === ""
+                      ? categories
+                      : categories.filter(
+                          (st) =>
+                            st !== null &&
+                            st.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).length /
+                      1000 +
+                    "k"
+                  : (keyword === ""
+                      ? categories
+                      : categories.filter(
+                          (st) =>
+                            st !== null &&
+                            st.name.toLowerCase().trim().includes(keyword)
+                        )
+                    ).length}
+                )
+              </span>
+            )}
           </span>{" "}
         </div>
       )}
@@ -117,7 +400,14 @@ function SuperFilter() {
       {/* search results */}
       <div className="w-full flex flex-col md:flex-row flex-wrap md:my-8 py-2">
         {type === "sales" &&
-          (keyword === "" ? sales : sales.filter(st => st.stock !== null && st.stock.name.toLowerCase().trim().includes(keyword))).map((s) => (
+          (keyword === ""
+            ? sales
+            : sales.filter(
+                (st) =>
+                  st.stock !== null &&
+                  st.stock.name.toLowerCase().trim().includes(keyword)
+              )
+          ).map((s) => (
             <SalesCard
               id={s._id}
               key={s._id}
@@ -134,7 +424,12 @@ function SuperFilter() {
           ))}
 
         {type === "category" &&
-          (keyword === "" ? categories : categories.filter(st => st.name.toLowerCase().trim().includes(keyword))).map((c) => (
+          (keyword === ""
+            ? categories
+            : categories.filter((st) =>
+                st.name.toLowerCase().trim().includes(keyword)
+              )
+          ).map((c) => (
             <CategoriesCard
               id={c._id}
               key={c._id}
@@ -148,7 +443,12 @@ function SuperFilter() {
           ))}
 
         {type === "stock" &&
-          (keyword === "" ? stock : stock.filter(st => st.name.toLowerCase().trim().includes(keyword))).map((s) => (
+          (keyword === ""
+            ? stock
+            : stock.filter((st) =>
+                st.name.toLowerCase().trim().includes(keyword)
+              )
+          ).map((s) => (
             <StockCard
               id={s._id}
               key={s._id}
@@ -164,7 +464,12 @@ function SuperFilter() {
           ))}
 
         {type === "expenses" &&
-          (keyword === "" ? expenses : expenses.filter(st => st.name.toLowerCase().trim().includes(keyword))).map((e) => (
+          (keyword === ""
+            ? expenses
+            : expenses.filter((st) =>
+                st.name.toLowerCase().trim().includes(keyword)
+              )
+          ).map((e) => (
             <ExpenseCard
               id={e._id}
               key={e._id}
@@ -176,8 +481,7 @@ function SuperFilter() {
               updated={e.updatedAt}
               callback={fetchAllTypes}
             />
-          ))
-        }
+          ))}
       </div>
     </div>
   );

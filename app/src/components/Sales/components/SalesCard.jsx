@@ -30,7 +30,7 @@ function SalesCard({ id, name, amount, stock, stockSelected, seller, date, creat
   };
 
   const deleteExpense = async () => {
-    await axios.delete(`http://localhost:10000/sales/${id}`)
+    await axios.delete(`https://oyster-app-k8jcp.ondigitalocean.app/sales/${id}`)
     .then(
       async res => {
         if(res.data.success === true){
@@ -39,7 +39,7 @@ function SalesCard({ id, name, amount, stock, stockSelected, seller, date, creat
               seller: localStorage.getItem('smartId'),
               details: `Removed ${amount} of ${name} from the sales list`
             }
-            const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
+            const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
             if(activityUpdate) callback();
         } else {
           console.log('Error deleting sales', res.data.message);
@@ -54,7 +54,7 @@ function SalesCard({ id, name, amount, stock, stockSelected, seller, date, creat
   } 
 
   return (
-    <span className="flex flex-col p-3 mt-2 w-full xl:w-[23.5%] md:w-[47.5%] h-auto rounded-lg bg-accent-gray dark:bg-primary-glass hover:opacity-[105] mr-4 shrink-0">
+    <span className="flex flex-col p-3 mt-2 w-full xl:w-[23.5%] md:w-[47%] h-auto rounded-lg bg-accent-gray dark:bg-primary-glass hover:opacity-[105] mr-4 shrink-0">
       {openEditSalesModal && stock.length > 0 && stockSelected !== 'Stock removed' && (
         <EditSalesModal id={id} name={name} amount={amount} stockSelected={stockSelected} stock={stock} seller={seller} date={date} onClose={toggleModal} callback={callback} />
       )}
