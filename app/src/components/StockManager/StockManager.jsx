@@ -33,6 +33,7 @@ ChartJS.register(
 function StockManager() {
   const [loading, setLoading] = useState(false);
   const [stock, setStock] = useState([]);
+  const [sales, setSales] = useState([]);
   const [startDate, setStartDate] = useState("");
   const [allCategories, setAllCategories] = useState([]);
   const [allWeekGroceries, setAllWeekGroceries] = useState([
@@ -76,7 +77,7 @@ function StockManager() {
       },
       title: {
         display: true,
-        text: "Monthly Stock",
+        text: "Monthly Trend",
         color: "#ffffff",
       },
     },
@@ -119,8 +120,8 @@ function StockManager() {
 
   const fetchCategories = async () => {
     try {
-      setLoading(true)
-      const response = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/categories");
+      setLoading(true);
+      const response = await axios.get("http://localhost:10000/categories");
       const categories = response.data.data
         .filter(
           (c) => c.seller && c.seller._id === localStorage.getItem("smartId")
@@ -128,22 +129,21 @@ function StockManager() {
         .map((category) => category.name.toLowerCase().trim());
       setAllCategories(categories);
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.error("Error fetching categories:", error);
-    } finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
-  
+
   const fetchStock = async () => {
     try {
-      setLoading(true)
-      const response = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/stock");
+      setLoading(true);
+      const response = await axios.get("http://localhost:10000/stock");
       const allStock = response.data.data.filter(
         (item) =>
           item.seller && item.seller._id === localStorage.getItem("smartId")
       );
-
       setStock(allStock.reverse());
 
       // Filter stock based on the selected date range
@@ -187,49 +187,60 @@ function StockManager() {
                 !item.type.toLowerCase().trim().includes("mtaji")) &&
               (item.type.toLowerCase().trim() !== "kianzio" ||
                 !item.type.toLowerCase().trim().includes("kianzio")) &&
-              parseInt(
-                item.quantity
-                  .split(" ")
-                  .filter((q) => (!isNaN(parseInt(q)) ? parseInt(q) : 0))
-              );
+              parseInt(item.quantity);
           }
         }
       });
 
       setAllMonthsStock(stockData);
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.error("Error fetching stock data:", error);
-    }finally{
-      setLoading(false)
+    } finally {
+      setLoading(false);
     }
   };
 
- 
+  const fetchSales = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get("http://localhost:10000/sales");
+      const allSales = response.data.data.filter(
+        (s) => s.seller && s.seller._id === localStorage.getItem("smartId")
+      );
+      setSales(allSales);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error fetching categories:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchCategories();
     fetchStock();
+    fetchSales();
   }, []);
 
   useEffect(() => {
-     // Count the occurrences of each type in the stock
-     const typeCountMap = {};
-     stock.forEach((item) => {
-       const type = item.type.toLowerCase().trim();
-       if (typeCountMap[type]) {
-         typeCountMap[type] += 1;
-       } else {
-         typeCountMap[type] = 1;
-       }
-     });
+    // Count the occurrences of each type in the stock
+    const typeCountMap = {};
+    stock.forEach((item) => {
+      const type = item.type.toLowerCase().trim();
+      if (typeCountMap[type]) {
+        typeCountMap[type] += 1;
+      } else {
+        typeCountMap[type] = 1;
+      }
+    });
 
-     // Set the allWeekGroceries state based on the counts of each category
-     const groceriesData = allCategories.map(
-       (category) => typeCountMap[category] || 0
-     );
-     setAllWeekGroceries(groceriesData);
-  },[stock])
+    // Set the allWeekGroceries state based on the counts of each category
+    const groceriesData = allCategories.map(
+      (category) => typeCountMap[category] || 0
+    );
+    setAllWeekGroceries(groceriesData);
+  }, [stock]);
 
   const doughnutData = {
     labels: allCategories,
@@ -275,35 +286,11 @@ function StockManager() {
       <span className="w-full mt-2 md:mt-0 flex items-center justify-between text-primary-dark dark:text-primary-light font-bold text-lg md:text-xl lg:text-2xl">
         <span className="hidden md:flex items-center">
           <FaBoxOpen className="mr-2" />
-          StockManager (
-          <span className="text-primary-dark dark:text-accent-gray">
-            {!loading && allMonthsStock.reduce(
-              (a, s) =>
-                (a += !isNaN(s.quantity)
-                  ? s.quantity
-                      .split(" ")
-                      .forEach((q) => (!isNaN(parseInt(q)) ? parseInt(q) : 0))
-                  : s),
-              0
-            )}
-          </span>
-          )
+          StockManager
         </span>
         <span className="flex md:hidden items-center">
           <FaBoxOpen className="mr-2" />
-          Stock (
-          <span className="text-primary-dark dark:text-accent-gray">
-            {!loading && allMonthsStock.reduce(
-              (a, s) =>
-                (a += !isNaN(s.quantity)
-                  ? s.quantity
-                      .split(" ")
-                      .forEach((q) => (!isNaN(parseInt(q)) ? parseInt(q) : 0))
-                  : s),
-              0
-            )}
-          </span>
-          )
+          Stock
         </span>
         <span>
           <button
@@ -326,14 +313,16 @@ function StockManager() {
             There are no stock updates currently
           </span>
         ) : (
-          stock &&
+          stock.length > 0 &&
           stock.map((s) => (
             <StockCard
               id={s._id}
               key={s._id}
               name={s.name}
               type={s.type}
+              sales={sales}
               quantity={s.quantity}
+              unitPrice={s.unitPrice}
               categories={allCategories}
               date={s.date}
               seller={s.seller}
@@ -359,7 +348,8 @@ function StockManager() {
               0
             )}
           </span>{" "}
-          stock in store. Here is the chat analysis for you :
+          stock brought in store just this month. Here is the chat analysis for
+          you :
         </p>
         {/* charts */}
         <div className=" w-full flex flex-col md:flex-row items-center justify-between">

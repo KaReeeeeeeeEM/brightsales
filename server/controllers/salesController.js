@@ -12,13 +12,14 @@ exports.getSales = async (req,res) => {
 }
 
 exports.createSales = async (req,res) => {
-    const { stock, amount, seller, date } = req.body;
-    if(!stock || !amount || !seller || !date) return res.status(400).json({success: false, message: 'Bad request!'});
+    const { stock, amount, seller, quantity, date } = req.body;
+    if(!stock || !amount || !seller || !quantity || !date) return res.status(400).json({success: false, message: 'Bad request!'});
 
     try{
         const payload = {
             stock: stock,
             amount: amount,
+            quantity: quantity,
             seller: seller,
             date: date
         }
@@ -35,7 +36,6 @@ exports.createSales = async (req,res) => {
 exports.updateSales = async (req,res) => {
     const { id } = req.params;
     if(!id) return res.status(400).json({success: false, message:'Bad request' });
-
     try{
         await Sales.findByIdAndUpdate(id, req.body);
         console.log({success: true, data: '', message: 'Sale updated successfully!' })

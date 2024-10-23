@@ -3,13 +3,17 @@
 import axios from "axios";
 import React, { useState } from "react";
 
-function SalesModal({ onClose, callback, stock }) {
+function SalesModal({ onClose, callback, stock, sales }) {
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState("");
+  const [unitsLeft, setUnitsLeft]= useState(0);
+  const [maxUnits, setMaxUnits] = useState(0);
   const [formData, setFormData] = useState({
     stock: "",
     amount: "",
+    quantity: 0,
     seller: "",
     date: ""
   });
@@ -20,13 +24,46 @@ function SalesModal({ onClose, callback, stock }) {
     setMessage("");
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    if(name === 'stock' && value !== ''){
+      const stockAvailable = stock.filter(s => s._id === value).reduce(
+        (a, s) =>
+          (a +=
+            (s.type.toLowerCase().trim() !== "capital" || !s.type.toLowerCase().trim().includes('capital')) &&
+            (s.type.toLowerCase().trim() !== "mtaji" || !s.type.toLowerCase().trim().includes('mtaji')) &&
+            (s.type.toLowerCase().trim() !== "kianzio" || !s.type.toLowerCase().trim().includes('kianzio')) &&
+            (isNaN(s.quantity)
+              ? parseInt(s.quantity.split(" ").filter((q) => !isNaN(q)))
+              : parseInt(s.quantity))),
+        0
+      ) - (sales.length > 0 ? sales.filter(s => s.stock !== null && s.stock._id === value).reduce((a,s) => a += s.quantity ,0) : 0)
+      setError('')
+      setUnitsLeft(stockAvailable)
+      setFormData({...formData, quantity: 0})
+
+      if(stockAvailable < formData.quantity) setError('You have exceeded units available!') 
+
+      setMaxUnits(stockAvailable)
+      setFormData({ ...formData, stock: value });
+    }
+
+    if(name === 'quantity' && value !== 0){
+      if(maxUnits - value < 0){
+        setUnitsLeft('')
+        setError('You have exceeded units available!') 
+      } else{
+        setError('')
+        setUnitsLeft(maxUnits - value)
+      }
+      setFormData({...formData, quantity: value, amount: value * stock.filter(s => s._id === formData.stock)[0].unitPrice})
+    }
   };
 
   const handleSubmit = async (e) => {
     setLoading(true)
     e.preventDefault();
-    const { stock, amount, date } = formData;
-    if (!stock || !amount || !date) {
+    const { stock, amount, quantity, date } = formData;
+    if (!stock || !amount || !quantity || !date) {
       setErrors("Please fill all fields!");
       return;
     }
@@ -34,12 +71,13 @@ function SalesModal({ onClose, callback, stock }) {
     const finalData = {
       stock: stock,
       amount: amount,
+      quantity: quantity,
       seller: localStorage.getItem("smartId"),
       date: date,
     };
 
     await axios
-      .post("https://oyster-app-k8jcp.ondigitalocean.app/sales", finalData)
+      .post("http://localhost:10000/sales", finalData)
       .then(async (res) => {
         const { success, message } = res.data;
         const stockName = allStock.length > 0 && allStock.filter(s => s._id === formData.stock)[0].name;
@@ -50,11 +88,12 @@ function SalesModal({ onClose, callback, stock }) {
             seller: localStorage.getItem('smartId'),
             details: `Sold Tshs ${finalData.amount}/= worth of ${stockName}`
           }
-          const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
+          const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
           if(activityUpdate.data.success === true){
                 setFormData({
                   name: "",
                   amount: "",
+                  quantity: 0,
                   date: "",
                 });
                 callback()
@@ -114,6 +153,28 @@ function SalesModal({ onClose, callback, stock }) {
               </select>
             </div>
 
+              {/* quantity */}
+              <div className="relative w-full mt-2 md:mt-4 flex flex-col">
+              <label
+                className="block text-start text-primary-light dark:text-accent-gray text-sm font-bold mb-2"
+                htmlFor="quantity"
+              >
+                Units sold
+              </label>
+              <input
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                id="quantity"
+                required
+                name="quantity"
+                type="number"
+                value={formData.quantity}
+                onChange={handleChange}
+                placeholder="How many units did you sell?"
+              />
+              {error && <span className="text-red-500 text-xs text-start mt-1">{error}</span>}
+              {maxUnits !== 0 && maxUnits > formData.quantity && !error && <span className="text-primary-light mt-1 dark:text-accent-gray text-xs self-start">Units available: <span className="font-bold text-green-600">{unitsLeft !== 0 ? maxUnits - formData.quantity : maxUnits}</span></span>}
+            </div>
+
             {/* amount */}
             <div className="relative w-full mt-2 md:mt-4">
               <label
@@ -130,9 +191,11 @@ function SalesModal({ onClose, callback, stock }) {
                 type="number"
                 value={formData.amount}
                 onChange={handleChange}
-                placeholder="How much did you earn? eg.3000, 300000, etc "
+                placeholder="How much did you sell? eg.3000, 300000, etc "
               />
             </div>
+
+           
 
             {/* Date */}
             <div className="relative w-full mt-2 md:mt-4">
@@ -159,8 +222,8 @@ function SalesModal({ onClose, callback, stock }) {
               type="submit"
               className={`w-full mt-6 px-4 py-2 text-accent-darkGray dark:text-accent-gray flex items-center justify-center text-center bg-primary dark:bg-accent-darkGray rounded-lg hover:opacity-85 transition ease-in-out duration-700 ${
                 loading ? "cursor-not-allowed opacity-50" : ""
-              }`}
-              disabled={loading}
+              } disabled:opacity-50`}
+              disabled={loading || error}
             >
               {loading ? "Recording sales..." : "Record Sale"}
             </button>

@@ -10,6 +10,7 @@ function StockModal({ onClose, callback, categories }) {
     name: "",
     type: "",
     quantity: "",
+    unitPrice: 0,
     date: "",
   });
 
@@ -23,8 +24,8 @@ function StockModal({ onClose, callback, categories }) {
   const handleSubmit = async (e) => {
     setLoading(true)
     e.preventDefault();
-    const { name, type, quantity, date } = formData;
-    if (!name || !type || !quantity || !date) {
+    const { name, type, quantity, unitPrice, date } = formData;
+    if (!name || !type || !quantity || !unitPrice || !date) {
       setErrors("Please fill all fields!");
       return;
     }
@@ -33,12 +34,13 @@ function StockModal({ onClose, callback, categories }) {
       name: name,
       type: type,
       quantity: quantity,
+      unitPrice: unitPrice,
       seller: localStorage.getItem("smartId"),
       date: date,
     };
 
     await axios
-      .post("https://oyster-app-k8jcp.ondigitalocean.app/stock", finalData)
+      .post("http://localhost:10000/stock", finalData)
       .then(async (res) => {
         const { success, message } = res.data;
         if (success && success === true) {
@@ -48,12 +50,13 @@ function StockModal({ onClose, callback, categories }) {
             seller: localStorage.getItem('smartId'),
             details: `Added ${finalData.quantity} of ${finalData.name}`
           }
-          const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
+          const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
           if(activityUpdate.data.success === true){
                 setFormData({
                   name: "",
                   type: "",
                   quantity: "",
+                  unitPrice: 0,
                   date: "",
                 });
                 callback()
@@ -139,19 +142,40 @@ function StockModal({ onClose, callback, categories }) {
                 className="block text-start text-primary-light dark:text-accent-gray text-sm font-bold mb-2"
                 htmlFor="quantity"
               >
-                Quantity
+                {formData.type.toLowerCase().trim() !== 'capital' ? 'Quantity' : 'Amount (in Tshs)'}
               </label>
               <input
                 className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
                 id="quantity"
                 required
                 name="quantity"
-                type="text"
+                type="number"
                 value={formData.quantity}
                 onChange={handleChange}
-                placeholder="eg 2 bags, 3 sacks, 4 pipes, 6 strings etc"
+                placeholder="eg 10, 200, 300, 400 etc"
               />
             </div>
+
+
+            {/* unit price */}
+           {formData.type.toLowerCase().trim() !== 'capital' && <div className="relative w-full mt-2 md:mt-4">
+              <label
+                className="block text-start text-primary-light dark:text-accent-gray text-sm font-bold mb-2"
+                htmlFor="unitPrice"
+              >
+                Unit Price
+              </label>
+              <input
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                id="unitPrice"
+                required
+                name="unitPrice"
+                type="number"
+                value={formData.unitPrice}
+                onChange={handleChange}
+                placeholder="How much do you sell per unit? (in Tshs)"
+              />
+            </div>}
 
             {/* Date */}
             <div className="relative w-full mt-2 md:mt-4">

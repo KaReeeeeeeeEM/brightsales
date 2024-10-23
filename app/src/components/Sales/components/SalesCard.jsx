@@ -6,7 +6,7 @@ import EditSalesModal from "./EditSalesModal";
 import axios from "axios";
 import DeleteSalesModal from "./DeleteSalesModal";
 
-function SalesCard({ id, name, amount, stock, stockSelected, seller, date, created, updated, callback }) {
+function SalesCard({ id, name, sales, type, amount, quantity, stock, stockSelected, seller, date, created, updated, callback }) {
   const [openEditSalesModal, setOpenEditSalesModal] = useState(false);
   const [openDeleteSalesModal, setOpenDeleteSalesModal] = useState(false);
 
@@ -30,7 +30,7 @@ function SalesCard({ id, name, amount, stock, stockSelected, seller, date, creat
   };
 
   const deleteExpense = async () => {
-    await axios.delete(`https://oyster-app-k8jcp.ondigitalocean.app/sales/${id}`)
+    await axios.delete(`http://localhost:10000/sales/${id}`)
     .then(
       async res => {
         if(res.data.success === true){
@@ -39,7 +39,7 @@ function SalesCard({ id, name, amount, stock, stockSelected, seller, date, creat
               seller: localStorage.getItem('smartId'),
               details: `Removed ${amount} of ${name} from the sales list`
             }
-            const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
+            const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
             if(activityUpdate) callback();
         } else {
           console.log('Error deleting sales', res.data.message);
@@ -56,13 +56,13 @@ function SalesCard({ id, name, amount, stock, stockSelected, seller, date, creat
   return (
     <span className="flex flex-col p-3 mt-2 w-full xl:w-[23.5%] md:w-[47%] h-auto rounded-lg bg-accent-gray dark:bg-primary-glass hover:opacity-[105] mr-4 shrink-0">
       {openEditSalesModal && stock.length > 0 && stockSelected !== 'Stock removed' && (
-        <EditSalesModal id={id} name={name} amount={amount} stockSelected={stockSelected} stock={stock} seller={seller} date={date} onClose={toggleModal} callback={callback} />
+        <EditSalesModal id={id} name={name} amount={amount} quantity={quantity} stockSelected={stockSelected} stock={stock} sales={sales} seller={seller} date={date} onClose={toggleModal} callback={callback} />
       )}
       {openDeleteSalesModal && <DeleteSalesModal name={name} confirm={deleteExpense} onClose={toggleOpenDeleteModal} />}
       <span className="w-full flex items-center justify-between">
         <span className="flex items-center">
           <FaChartBar className="mr-2" />
-          <span className={`text-gray font-semibold text-sm ${name === 'Stock name not present' ? 'italic line-through text-accent-darkGray' : ''}`}>{name}</span>
+          <span className={`text-gray font-semibold text-sm ${name === 'Stock name not present' ? 'italic line-through text-accent-darkGray' : ''}`}>{name} {stockSelected && name !== 'Stock name not present' ? " (" + stockSelected.type + ")" : ''}</span>
         </span>
 
         <span className="text-xs text-[#333] dark:text-accent-gray">
@@ -72,6 +72,10 @@ function SalesCard({ id, name, amount, stock, stockSelected, seller, date, creat
       <span className="text-sm flex items-center">
         <span className="mr-2">Amount: </span>
         <span className="text-[#333] dark:text-accent-gray">Tsh {amount}/=</span>
+      </span>
+      <span className="text-sm flex items-center">
+        <span className="mr-2">Units Sold: </span>
+        <span className="text-[#333] dark:text-accent-gray">{quantity}</span>
       </span>
       <span className="text-sm flex items-center">
         <span className="mr-2">Made by: </span>

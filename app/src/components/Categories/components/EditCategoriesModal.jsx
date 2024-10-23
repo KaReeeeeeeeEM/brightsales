@@ -33,7 +33,7 @@ function EditCategoriesModal({ onClose, callback, id, name }) {
     };
 
     await axios
-      .put(`https://oyster-app-k8jcp.ondigitalocean.app/categories/${id}`, finalData)
+      .put(`http://localhost:10000/categories/${id}`, finalData)
       .then((res) => {
         const { success, message } = res.data;
         if (success && success === true) {

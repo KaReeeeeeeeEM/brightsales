@@ -15,7 +15,7 @@ function ExpenseTracker() {
   const fetchExpenses = async () => {
     setLoading(true)
     await axios
-      .get("https://oyster-app-k8jcp.ondigitalocean.app/expenses")
+      .get("http://localhost:10000/expenses")
       .then((res) => {
         setLoading(false)
         setExpenses(

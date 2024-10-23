@@ -21,10 +21,10 @@ function SuperFilter() {
 
   const fetchAllTypes = async () => {
     setLoading(true);
-    const allStock = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/stock");
-    const allSales = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/sales");
-    const allCategories = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/categories");
-    const allExpenses = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/expenses");
+    const allStock = await axios.get("http://localhost:10000/stock");
+    const allSales = await axios.get("http://localhost:10000/sales");
+    const allCategories = await axios.get("http://localhost:10000/categories");
+    const allExpenses = await axios.get("http://localhost:10000/expenses");
 
     setStock(
       allStock.data.data
@@ -167,7 +167,7 @@ function SuperFilter() {
                   (a, s) =>
                     (a += isNaN(s.quantity)
                       ? parseInt(s.quantity.split(" ").filter((q) => !isNaN(q)))
-                      : s),
+                      : parseInt(s.quantity) - sales.filter(sa => sa.stock !== null && sa.stock._id === s._id).reduce((ac,sal) => ac += sal.quantity ,0)),
                   0
                 ) > 1000000
                   ? (keyword === ""
@@ -183,7 +183,7 @@ function SuperFilter() {
                           ? parseInt(
                               s.quantity.split(" ").filter((q) => !isNaN(q))
                             )
-                          : s),
+                          : parseInt(s.quantity) - sales.filter(sa => sa.stock !== null && sa.stock._id === s._id).reduce((ac,sal) => ac += sal.quantity ,0)),
                       0
                     ) /
                       1000000 +
@@ -201,7 +201,7 @@ function SuperFilter() {
                           ? parseInt(
                               s.quantity.split(" ").filter((q) => !isNaN(q))
                             )
-                          : s),
+                          : parseInt(s.quantity) - sales.filter(sa => sa.stock !== null && sa.stock._id === s._id).reduce((ac,sal) => ac += sal.quantity ,0)),
                       0
                     ) > 1000
                   ? (keyword === ""
@@ -217,7 +217,7 @@ function SuperFilter() {
                           ? parseInt(
                               s.quantity.split(" ").filter((q) => !isNaN(q))
                             )
-                          : s),
+                          : parseInt(s.quantity) - sales.filter(sa => sa.stock !== null && sa.stock._id === s._id).reduce((ac,sal) => ac += sal.quantity ,0)),
                       0
                     ) /
                       1000 +
@@ -235,7 +235,7 @@ function SuperFilter() {
                           ? parseInt(
                               s.quantity.split(" ").filter((q) => !isNaN(q))
                             )
-                          : s),
+                          : parseInt(s.quantity) - sales.filter(sa => sa.stock !== null && sa.stock._id === s._id).reduce((ac,sal) => ac += sal.quantity ,0)),
                       0
                     )}
                 )
@@ -428,6 +428,7 @@ function SuperFilter() {
               name={s.stock ? s.stock.name : "Stock name not present"}
               amount={s.amount}
               date={s.date}
+              quantity={s.quantity}
               seller={s.seller}
               created={s.createdAt}
               updated={s.updatedAt}
@@ -478,6 +479,9 @@ function SuperFilter() {
               key={s._id}
               name={s.name}
               type={s.type}
+              sales={sales}
+              categories={categories}
+              unitPrice={s.unitPrice}
               quantity={s.quantity}
               date={s.date}
               seller={s.seller}

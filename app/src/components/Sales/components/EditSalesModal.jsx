@@ -1,15 +1,29 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amount, date }) {
+function EditSalesModal({
+  onClose,
+  callback,
+  id,
+  stock,
+  sales,
+  stockSelected,
+  amount,
+  quantity,
+  date,
+}) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState("");
+  const [error, setError] = useState("");
+  const [unitsLeft, setUnitsLeft] = useState(0);
+  const [maxUnits, setMaxUnits] = useState(0);
   const [formData, setFormData] = useState({
     stock: stockSelected._id,
     amount: amount,
+    quantity: quantity,
     date: date,
   });
 
@@ -18,13 +32,89 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
     setMessage("");
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    if (name === "stock" && value !== "") {
+      const stockAvailable =
+        stock
+          .filter((s) => s._id === value)
+          .reduce(
+            (a, s) =>
+              (a +=
+                (s.type.toLowerCase().trim() !== "capital" ||
+                  !s.type.toLowerCase().trim().includes("capital")) &&
+                (s.type.toLowerCase().trim() !== "mtaji" ||
+                  !s.type.toLowerCase().trim().includes("mtaji")) &&
+                (s.type.toLowerCase().trim() !== "kianzio" ||
+                  !s.type.toLowerCase().trim().includes("kianzio")) &&
+                (isNaN(s.quantity)
+                  ? parseInt(s.quantity.split(" ").filter((q) => !isNaN(q)))
+                  : parseInt(s.quantity))),
+            0
+          ) -
+        (sales.filter((s) => s.stock._id === value).length > 0
+          ? sales
+              .filter((s) => s.stock._id === value)
+              .reduce((a, s) => (a += s.quantity), 0)
+          : 0);
+      setError("");
+      setUnitsLeft(stockAvailable);
+      setFormData({ ...formData, quantity: 0 });
+
+      setMaxUnits(stockAvailable);
+      setFormData({ ...formData, stock: value });
+    }
+
+    if (name === "quantity" && value !== 0) {
+      const units = stock
+        .filter((s) => s._id === formData.stock)
+        .reduce(
+          (a, s) =>
+            (a +=
+              (s.type.toLowerCase().trim() !== "capital" ||
+                !s.type.toLowerCase().trim().includes("capital")) &&
+              (s.type.toLowerCase().trim() !== "mtaji" ||
+                !s.type.toLowerCase().trim().includes("mtaji")) &&
+              (s.type.toLowerCase().trim() !== "kianzio" ||
+                !s.type.toLowerCase().trim().includes("kianzio")) &&
+              (isNaN(s.quantity)
+                ? parseInt(s.quantity.split(" ").filter((q) => !isNaN(q)))
+                : parseInt(s.quantity))),
+          0
+        ) -
+        (sales.filter((s) => s.stock._id === formData.stock).length > 0
+          ? sales
+              .filter((s) => s.stock._id === formData.stock)
+              .reduce((a, s) => (a += s.quantity), 0)
+          : 0);
+
+      setUnitsLeft(units)
+      setMaxUnits(units)
+
+      if (stockSelected._id !== formData.stock && (units - value) < 0) {
+        setUnitsLeft("");
+        setError("You have exceeded units available!");
+      }
+
+      if (
+        stockSelected._id === formData.stock &&
+        (units + quantity - value) < 0
+      ) {
+        setUnitsLeft("");
+        setError("You have exceeded units available!");
+      } else {
+        setError("");
+        setUnitsLeft(units - value);
+      }
+
+      setFormData({...formData, quantity: value, amount: value * stock.filter(s => s._id === formData.stock)[0].unitPrice})
+    }
   };
 
   const handleSubmit = async (e) => {
-    setLoading(true)
+    setLoading(true);
     e.preventDefault();
-    const { stock, amount, date } = formData;
-    if (!stock || !amount || !date) {
+    const { stock, amount, quantity, date } = formData;
+    if (!stock || !amount || !quantity || !date) {
       setErrors("Please fill all fields!");
       return;
     }
@@ -32,12 +122,13 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
     const finalData = {
       stock: stock,
       amount: amount,
+      quantity: quantity,
       seller: localStorage.getItem("smartId"),
       date: date,
     };
 
     await axios
-      .put(`https://oyster-app-k8jcp.ondigitalocean.app/sales/${id}`, finalData)
+      .put(`http://localhost:10000/sales/${id}`, finalData)
       .then((res) => {
         const { success, message } = res.data;
         if (success && success === true) {
@@ -45,22 +136,30 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
           setFormData({
             stock: "",
             amount: "",
+            quantity: 0,
             date: "",
           });
-          callback()
+          callback();
           onClose();
         } else {
           setErrors(message);
         }
       })
       .catch((err) => {
-        setLoading(false)
-        console.log(err.response.data.message ? err.response.data.message : "Error while updating expense", err);
-        setErrors(err.response.data.message ? err.response.data.message : "Error while updating expense");
+        setLoading(false);
+        console.log(
+          err.response.data.message
+            ? err.response.data.message
+            : "Error while updating expense",
+          err
+        );
+        setErrors(
+          err.response.data.message
+            ? err.response.data.message
+            : "Error while updating expense"
+        );
       })
-      .finally(
-        () => setLoading(false)
-      )
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -76,7 +175,7 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
             className="w-full h-full flex flex-col items-center justify-center p-4"
           >
             <span className="mb-4 text-xl font-bold text-primary-light dark:text-accent-gray">
-              Edit Expense Details
+              Edit Sales Details
             </span>
             {/* name */}
             <div className="relative w-full mt-2 md:mt-4">
@@ -84,7 +183,7 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
                 className="block text-start text-primary-light dark:text-accent-gray text-sm font-bold mb-2"
                 htmlFor="name"
               >
-               Stock Sold
+                Stock Sold
               </label>
               <select
                 id="stock"
@@ -94,11 +193,55 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
                 value={formData.stock}
                 onChange={handleChange}
                 autoFocus={true}
-                 className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
               >
                 <option value="">Choose stock sold</option>
-                {stock.length > 0 && stock.map(s => <option  key={s._id} value={s._id}>{s.name}</option>)}
+                {stock.length > 0 &&
+                  stock.map((s) => (
+                    <option key={s._id} value={s._id}>
+                      {s.name} ({s.type})
+                    </option>
+                  ))}
               </select>
+            </div>
+
+
+            {/* quantity */}
+            <div className="relative w-full mt-2 md:mt-4 flex flex-col">
+              <label
+                className="block text-start text-primary-light dark:text-accent-gray text-sm font-bold mb-2"
+                htmlFor="quantity"
+              >
+                Units sold
+              </label>
+              <input
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                id="quantity"
+                required
+                name="quantity"
+                type="number"
+                value={formData.quantity}
+                onChange={handleChange}
+                placeholder="How many units did you sell?"
+              />
+              {(error || (stockSelected._id !== formData.stock && unitsLeft < 0))  && (
+                <span className="text-red-500 text-xs text-start mt-1">
+                  {error && error}
+                  {unitsLeft < 0 && 'You have exceeded the available units!'}
+                </span>
+              )}
+              {maxUnits > 0 && maxUnits > formData.quantity && !error && (
+                <span className="text-primary-light mt-1 dark:text-accent-gray text-xs self-start">
+                  Net Units:{" "}
+                  <span className="font-bold text-green-600">
+                    {unitsLeft > 0
+                      ? stockSelected._id === formData.stock
+                        ? unitsLeft + quantity
+                        : unitsLeft
+                      : unitsLeft}
+                  </span>
+                </span>
+              )}
             </div>
 
             {/* amount */}
@@ -107,7 +250,7 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
                 className="block text-start text-primary-light dark:text-accent-gray text-sm font-bold mb-2"
                 htmlFor="amount"
               >
-                amount
+                Amount
               </label>
               <input
                 className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
@@ -120,6 +263,7 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
                 placeholder="Enter amount eg. 2000, 1000 etc"
               />
             </div>
+
 
             {/* Date */}
             <div className="relative w-full mt-2 md:mt-4">
@@ -146,8 +290,8 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
               type="submit"
               className={`w-full mt-6 px-4 py-2 text-accent-darkGray dark:text-accent-gray flex items-center justify-center text-center bg-primary dark:bg-accent-darkGray rounded-lg hover:opacity-85 transition ease-in-out duration-700 ${
                 loading ? "cursor-not-allowed opacity-50" : ""
-              }`}
-              disabled={loading}
+              } disabled:opacity-50`}
+              disabled={loading || error || (stockSelected._id !== formData.stock && unitsLeft < 0)}
             >
               {loading ? "Updating..." : "Update Expense"}
             </button>
@@ -162,4 +306,4 @@ function EditExpensesModal({ onClose, callback, id, stock, stockSelected , amoun
   );
 }
 
-export default EditExpensesModal;
+export default EditSalesModal;

@@ -5,12 +5,26 @@ import EditStockModal from "./EditStockModal";
 import axios from "axios";
 import DeleteStockModal from "./DeleteStockModal";
 
-function StockCard({ id, name, type, quantity, categories, seller, date, created, updated, callback }) {
+function StockCard({
+  id,
+  name,
+  type,
+  quantity,
+  sales,
+  unitPrice,
+  categories,
+  seller,
+  date,
+  created,
+  updated,
+  callback,
+}) {
   const [openEditStockModal, setOpenEditStockModal] = useState(false);
   const [openDeleteStockModal, setOpenDeleteStockModal] = useState(false);
 
   const toggleModal = () => setOpenEditStockModal(!openEditStockModal);
-  const toggleOpenDeleteModal = () => setOpenDeleteStockModal(!openDeleteStockModal);
+  const toggleOpenDeleteModal = () =>
+    setOpenDeleteStockModal(!openDeleteStockModal);
 
   // Utility function to calculate time difference
   const timeSince = (timestamp) => {
@@ -29,35 +43,52 @@ function StockCard({ id, name, type, quantity, categories, seller, date, created
   };
 
   const deleteStock = async () => {
-    await axios.delete(`https://oyster-app-k8jcp.ondigitalocean.app/stock/${id}`)
-    .then(
-      async res => {
-        if(res.data.success === true){
-            const newActivity = {
-              name: 'Stock Removed',
-              seller: localStorage.getItem('smartId'),
-              details: `Removed ${quantity} of ${name} from the store`
-            }
-            const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
-            if(activityUpdate) callback();
+    await axios
+      .delete(`http://localhost:10000/stock/${id}`)
+      .then(async (res) => {
+        if (res.data.success === true) {
+          const newActivity = {
+            name: "Stock Removed",
+            seller: localStorage.getItem("smartId"),
+            details: `Removed ${quantity} of ${name} from the store`,
+          };
+          const activityUpdate = await axios.post(
+            "http://localhost:10000/activity",
+            newActivity
+          );
+          if (activityUpdate) callback();
         } else {
-          console.log('Error deleting stock', res.data.message);
+          console.log("Error deleting stock", res.data.message);
         }
-      }
-    )
-    .catch(
-      err => {
-        console.log('Check your internet connection and try again!')
-      }
-    )
-  } 
+      })
+      .catch((err) => {
+        console.log("Check your internet connection and try again!");
+      });
+  };
 
   return (
     <span className="flex flex-col p-3 w-[16rem] h-auto rounded-lg bg-accent-gray dark:bg-primary-glass mr-4 shrink-0">
       {openEditStockModal && (
-        <EditStockModal id={id} name={name} type={type} categories={categories} quantity={quantity} seller={seller} date={date} onClose={toggleModal} callback={callback} />
+        <EditStockModal
+          id={id}
+          name={name}
+          type={type}
+          categories={categories}
+          quantity={quantity}
+          unitPrice={unitPrice}
+          seller={seller}
+          date={date}
+          onClose={toggleModal}
+          callback={callback}
+        />
       )}
-      {openDeleteStockModal && <DeleteStockModal name={name} confirm={deleteStock} onClose={toggleOpenDeleteModal} />}
+      {openDeleteStockModal && (
+        <DeleteStockModal
+          name={name}
+          confirm={deleteStock}
+          onClose={toggleOpenDeleteModal}
+        />
+      )}
       <span className="w-full flex items-center justify-between">
         <span className="flex items-center">
           <FaStackOverflow className="mr-2" />
@@ -73,9 +104,65 @@ function StockCard({ id, name, type, quantity, categories, seller, date, created
         <span className="text-[#333] dark:text-accent-gray">{type}</span>
       </span>
       <span className="text-sm flex items-center">
-        <span className="mr-2">Quantity: </span>
-        <span className="text-[#333] dark:text-accent-gray">{quantity}</span>
+        <span className="mr-2">
+          {type.toLowerCase().trim() !== "capital"
+            ? "Stock remaining"
+            : "Amount"}
+          :{" "}
+        </span>
+        <span className="text-[#333] dark:text-accent-gray">
+          {type.toLowerCase().trim() !== "capital" ? (
+            (type.toLowerCase().trim() !== "capital" ||
+              !type.toLowerCase().trim().includes("capital")) &&
+            (type.toLowerCase().trim() !== "mtaji" ||
+              !type.toLowerCase().trim().includes("mtaji")) &&
+            (type.toLowerCase().trim() !== "kianzio" ||
+              !type.toLowerCase().trim().includes("kianzio")) &&
+            isNaN(quantity) ? (
+              parseInt(quantity.split(" ").filter((q) => !isNaN(q))) -
+              (sales.filter((s) => s.stock && s.stock._id === id).length > 0 &&
+                sales
+                  .filter((s) => s.stock && s.stock._id === id)
+                  .reduce((a, s) => (a += parseInt(s.quantity)), 0)) +
+              " units"
+            ) : parseInt(quantity) -
+                (sales.filter((s) => s.stock !== null && s.stock._id === id)
+                  .length > 0
+                  ? sales
+                      .filter((s) => s.stock && s.stock._id === id)
+                      .reduce((a, s) => (a += s.quantity), 0)
+                  : 0) <=
+              0 ? (
+              <span className="text-red-700 italic text-xs py-[2px] px-2 bg-red-100 rounded font-semibold">Out of stock</span>
+            ) : (
+              parseInt(quantity) -
+              (sales.filter((s) => s.stock !== null && s.stock._id === id)
+                .length > 0
+                ? sales
+                    .filter((s) => s.stock && s.stock._id === id)
+                    .reduce((a, s) => (a += s.quantity), 0)
+                : 0) +
+              " units"
+            )
+          ) : (
+            `Tsh ${quantity}/=`
+          )}
+        </span>
       </span>
+      {type.toLowerCase().trim() !== "capital" && (
+        <span className="text-sm flex items-center">
+          <span className="mr-2">Unit Price: </span>
+          <span
+            className={
+              unitPrice === 0
+                ? "italic text-red-600"
+                : "text-[#333] dark:text-accent-gray"
+            }
+          >
+            {unitPrice === 0 ? "Not set" : `Tsh ${unitPrice}/=`}
+          </span>
+        </span>
+      )}
       <span className="text-sm flex items-center">
         <span className="mr-2">Added by: </span>
         <span className="text-[#333] dark:text-accent-gray">
@@ -95,7 +182,12 @@ function StockCard({ id, name, type, quantity, categories, seller, date, created
           Edit
         </button>
 
-        <button onClick={toggleOpenDeleteModal} className="bg-red-800 text-white">Delete</button>
+        <button
+          onClick={toggleOpenDeleteModal}
+          className="bg-red-800 text-white"
+        >
+          Delete
+        </button>
       </div>
     </span>
   );

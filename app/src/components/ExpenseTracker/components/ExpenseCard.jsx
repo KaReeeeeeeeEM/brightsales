@@ -30,7 +30,7 @@ function ExpenseCard({ id, name, cost, seller, date, created, updated, callback 
   };
 
   const deleteExpense = async () => {
-    await axios.delete(`https://oyster-app-k8jcp.ondigitalocean.app/expenses/${id}`)
+    await axios.delete(`http://localhost:10000/expenses/${id}`)
     .then(
       async res => {
         if(res.data.success === true){
@@ -39,7 +39,7 @@ function ExpenseCard({ id, name, cost, seller, date, created, updated, callback 
               seller: localStorage.getItem('smartId'),
               details: `Removed ${cost} of ${name} from the expense list`
             }
-            const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
+            const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
             if(activityUpdate) callback();
         } else {
           console.log('Error deleting expense', res.data.message);

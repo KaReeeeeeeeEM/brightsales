@@ -44,7 +44,7 @@ function SideNav({isCollapsed,setIsCollapsed,selected,setSelected}) {
             <span className='mt-4'>
                 <span onClick={() => setSelected('Sales')} className={`flex items-center cursor-pointer ${!isCollapsed ? 'justify-start' : 'justify-center'} px-4 py-2 text-sm ${selected === 'Sales'? 'bg-accent-gray dark:bg-primary-glass text-accent-darkGray dark:text-primary-light' : '' } hover:bg-primary-glass hover:text-accent-gray transition-all ease-in-out duration-700 rounded`}>
                     <FaChartBar className={`text-sm md:text-md lg:text-lg ${!isCollapsed ? 'md:mr-2' : ''}`} />
-                    <span className='hidden md:block'> {!isCollapsed ? 'Sales' : ''} </span>
+                    <span className='hidden md:block'> {!isCollapsed ? 'Sales Recorder' : ''} </span>
                 </span>
             </span>
 

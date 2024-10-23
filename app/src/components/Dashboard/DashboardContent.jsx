@@ -38,8 +38,8 @@ ChartJS.register(
 function DashboardContent() {
   const [allStock, setAllStock] = useState([]);
   const [stockCount, setStockCount] = useState(0);
+  const [sales, setSales] = useState([]);
   const [totalSales, setTotalSales] = useState(0);
-  const [weeklySales, setWeeklySales] = useState(0);
   const [allWeeksSales, setAllWeeksSales] = useState([0, 0, 0, 0, 0, 0, 0]);
   const [totalExpenses, setTotalExpenses] = useState(0);
   const [activities, setActivities] = useState([]);
@@ -132,7 +132,7 @@ function DashboardContent() {
 
   const fetchActivities = async () => {
     await axios
-      .get("https://oyster-app-k8jcp.ondigitalocean.app/activity")
+      .get("http://localhost:10000/activity")
       .then((res) => {
         setActivities(
           res.data.data
@@ -153,7 +153,7 @@ function DashboardContent() {
 
   const fetchStock = async () => {
     await axios
-      .get("https://oyster-app-k8jcp.ondigitalocean.app/stock")
+      .get("http://localhost:10000/stock")
       .then((res) => {
         setAllStock(
           res.data.data.filter(
@@ -171,7 +171,7 @@ function DashboardContent() {
 
   const fetchExpenses = async () => {
     await axios
-      .get("https://oyster-app-k8jcp.ondigitalocean.app/expenses")
+      .get("http://localhost:10000/expenses")
       .then((res) => {
         setTotalExpenses(
           res.data.data
@@ -187,8 +187,13 @@ function DashboardContent() {
 
   const fetchSales = async () => {
     await axios
-      .get("https://oyster-app-k8jcp.ondigitalocean.app/sales")
+      .get("http://localhost:10000/sales")
       .then((res) => {
+        setSales(
+          res.data.data.filter(
+            (f) => f.seller && f.seller._id === localStorage.getItem("smartId")
+          )
+        );
         setTotalSales(
           res.data.data
             .filter(
@@ -289,14 +294,21 @@ function DashboardContent() {
               {allStock.reduce(
                 (a, s) =>
                   (a +=
-                    (s.type.toLowerCase().trim() !== "capital" || !s.type.toLowerCase().trim().includes('capital')) &&
-                    (s.type.toLowerCase().trim() !== "mtaji" || !s.type.toLowerCase().trim().includes('mtaji')) &&
-                    (s.type.toLowerCase().trim() !== "kianzio" || !s.type.toLowerCase().trim().includes('kianzio')) &&
+                    (s.type.toLowerCase().trim() !== "capital" ||
+                      !s.type.toLowerCase().trim().includes("capital")) &&
+                    (s.type.toLowerCase().trim() !== "mtaji" ||
+                      !s.type.toLowerCase().trim().includes("mtaji")) &&
+                    (s.type.toLowerCase().trim() !== "kianzio" ||
+                      !s.type.toLowerCase().trim().includes("kianzio")) &&
                     (isNaN(s.quantity)
                       ? parseInt(s.quantity.split(" ").filter((q) => !isNaN(q)))
                       : parseInt(s.quantity))),
                 0
-              )}
+              ) -
+                (sales.length > 0 &&
+                  sales
+                    .filter((sa) => sa.stock !== null)
+                    .reduce((a, ts) => (a += ts.quantity), 0))}
             </span>
             <span className="text-md text-accent-darkGray ml-1">
               {stockCount === 1 ? "item" : "items"}
@@ -358,17 +370,17 @@ function DashboardContent() {
               <FaCoins className="absolute top-0 left-0 w-full h-full p-2 text-accent-gray dark:text-primary-light group-hover:text-[#ccc] z-10" />
             </span>
             <span className="ml-2 text-primary-dark font-bold dark:text-accent-gray text-sm">
-              Total Expenses
+              Net Profit
             </span>
           </span>
           <span className="mx-6 mt-4">
             <span className="text-lg text-accent-darkGray mr-1">Tshs</span>
             <span className="font-bold text-4xl text-primary-dark dark:text-primary-light">
-              {totalExpenses > 1000000
-                ? totalExpenses / 1000000 + "M"
-                : totalExpenses > 1000
-                ? totalExpenses / 1000 + "k"
-                : totalExpenses}
+              {totalSales - totalExpenses > 1000000
+                ? (totalSales - totalExpenses) / 1000000 + "M"
+                : totalSales - totalExpenses > 1000
+                ? (totalSales - totalExpenses) / 1000 + "k"
+                : totalSales - totalExpenses}
             </span>
           </span>
         </div>

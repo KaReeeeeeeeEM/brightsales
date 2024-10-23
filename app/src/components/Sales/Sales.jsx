@@ -14,7 +14,7 @@ function Sales() {
   const fetchSales = async () => {
     setLoading(true)
     await axios
-      .get("https://oyster-app-k8jcp.ondigitalocean.app/sales")
+      .get("http://localhost:10000/sales")
       .then((res) => {
         setLoading(false)
         setSales(
@@ -39,7 +39,7 @@ function Sales() {
   const fetchStock = async () => {
     setLoading(true)
     await axios
-      .get("https://oyster-app-k8jcp.ondigitalocean.app/stock")
+      .get("http://localhost:10000/stock")
       .then((res) => {
         setLoading(false)
         setStock(
@@ -81,6 +81,7 @@ function Sales() {
           onClose={toggleOpenModal}
           callback={fetchSales}
           stock={stock}
+          sales={sales}
         />
       )}
       {/* title */}
@@ -124,6 +125,8 @@ function Sales() {
               id={s._id}
               key={s._id}
               stock={stock}
+              sales={sales}
+              quantity={s.quantity}
               stockSelected={s.stock ? s.stock : "Stock removed"}
               name={s.stock ? s.stock.name : "Stock name not present"}
               amount={s.amount}

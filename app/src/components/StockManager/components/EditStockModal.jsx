@@ -2,14 +2,28 @@
 import axios from "axios";
 import React, { useState } from "react";
 
-function EditStockModal({ onClose, callback, id, categories, name, type, quantity, date , seller}) {
+function EditStockModal({
+  onClose,
+  callback,
+  id,
+  categories,
+  name,
+  type,
+  quantity,
+  date,
+  unitPrice,
+  seller,
+}) {
   const [loading, setLoading] = useState(false);
+  const [remarks, setRemarks] = useState("");
+  const [difference, setDifference] = useState(0);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState("");
   const [formData, setFormData] = useState({
     name: name,
     type: type,
     quantity: quantity,
+    unitPrice: unitPrice,
     date: date,
   });
 
@@ -18,12 +32,17 @@ function EditStockModal({ onClose, callback, id, categories, name, type, quantit
     setMessage("");
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    if (name.toLowerCase().trim() === "quantity" && value !== 0) {
+      setDifference(value - quantity);
+      setFormData({ ...formData, quantity: value });
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { name, type, quantity, date } = formData;
-    if (!name || !type || !quantity || !date) {
+    const { name, type, quantity, unitPrice, date } = formData;
+    if (!name || !type || !quantity || !unitPrice || !date) {
       setErrors("Please fill all fields!");
       return;
     }
@@ -32,12 +51,13 @@ function EditStockModal({ onClose, callback, id, categories, name, type, quantit
       name: name,
       type: type,
       quantity: quantity,
+      unitPrice: unitPrice,
       seller: localStorage.getItem("smartId"),
       date: date,
     };
 
     await axios
-      .put(`https://oyster-app-k8jcp.ondigitalocean.app/stock/${id}`, finalData)
+      .put(`http://localhost:10000/stock/${id}`, finalData)
       .then((res) => {
         const { success, message } = res.data;
         if (success && success === true) {
@@ -46,17 +66,27 @@ function EditStockModal({ onClose, callback, id, categories, name, type, quantit
             name: "",
             type: "",
             quantity: "",
+            unitPrice: 0,
             date: "",
           });
-          callback()
+          callback();
           onClose();
         } else {
           setErrors(message);
         }
       })
       .catch((err) => {
-        console.log(err.response.data.message ? err.response.data.message : "Error while updating stock", err);
-        setErrors(err.response.data.message ? err.response.data.message : "Error while updating stock");
+        console.log(
+          err.response.data.message
+            ? err.response.data.message
+            : "Error while updating stock",
+          err
+        );
+        setErrors(
+          err.response.data.message
+            ? err.response.data.message
+            : "Error while updating stock"
+        );
       });
   };
 
@@ -112,31 +142,75 @@ function EditStockModal({ onClose, callback, id, categories, name, type, quantit
                 onChange={handleChange}
                 className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
               >
-              <option value="">Choose category of stock</option>
+                <option value="">Choose category of stock</option>
                 <option value="Capital">Capital (mtaji)</option>
-                {categories.map((c,i) => <option key={i} value={c}>{c}</option>)}
+                {categories.map((c, i) => (
+                  <option key={i} value={c}>
+                    {c}
+                  </option>
+                ))}
               </select>
             </div>
 
             {/* quantity */}
-            <div className="relative w-full mt-2 md:mt-4">
+            <div className="relative flex flex-col  w-full mt-2 md:mt-4">
               <label
                 className="block text-start text-primary-light dark:text-accent-gray text-sm font-bold mb-2"
                 htmlFor="quantity"
               >
-                Quantity
+                {formData.type.toLowerCase().trim() !== 'capital' ? 'Quantity' : 'Amount (in Tshs)'}
               </label>
               <input
                 className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
                 id="quantity"
                 required
                 name="quantity"
-                type="text"
+                type="number"
                 value={formData.quantity}
                 onChange={handleChange}
                 placeholder="Enter quantity eg. 2kg, 1 sack etc"
               />
+              <span className="text-xs self-start mt-2">
+                {difference !== 0 &&
+                  (difference > 0 ? (
+                    <span>
+                      Adding
+                      <span className="text-green-600 font-semibold mx-1">
+                        {difference}
+                      </span>
+                      more units
+                    </span>
+                  ) : (
+                    <span>
+                      Decreasing
+                      <span className="text-red-600 font-semibold mx-1">
+                        {-difference}
+                      </span>
+                      less units
+                    </span>
+                  ))}
+              </span>
             </div>
+
+            {/* unit price */}
+            {formData.type.toLowerCase().trim() !== 'capital' && <div className="relative w-full mt-2 md:mt-4">
+              <label
+                className="block text-start text-primary-light dark:text-accent-gray text-sm font-bold mb-2"
+                htmlFor="unitPrice"
+              >
+                Unit Price
+              </label>
+              <input
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                id="unitPrice"
+                required
+                name="unitPrice"
+                type="number"
+                value={formData.unitPrice}
+                onChange={handleChange}
+                placeholder="How much do you sell per unit? (in Tshs)"
+              />
+            </div>}
 
             {/* Date */}
             <div className="relative w-full mt-2 md:mt-4">
