@@ -130,6 +130,7 @@ function Sales() {
               stockSelected={s.stock ? s.stock : "Stock removed"}
               name={s.stock ? s.stock.name : "Stock name not present"}
               amount={s.amount}
+              sellingPrice={s.sellingPrice}
               date={s.date}
               seller={s.seller}
               created={s.createdAt}

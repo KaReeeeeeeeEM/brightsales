@@ -424,6 +424,7 @@ function SuperFilter() {
               id={s._id}
               key={s._id}
               stock={stock}
+              sellingPrice={s.sellingPrice}
               stockSelected={s.stock ? s.stock : "Stock removed"}
               name={s.stock ? s.stock.name : "Stock name not present"}
               amount={s.amount}

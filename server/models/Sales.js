@@ -8,6 +8,7 @@ const SalesScheme = mongoose.Schema(
       required: true,
     },
     amount: { type: "Number", required: true },
+    sellingPrice: { type: "Number", required: true },
     quantity: {type: "Number", default: 0 },
     seller: {
       type: mongoose.Schema.Types.ObjectId,

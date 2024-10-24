@@ -9,6 +9,7 @@ function EditSalesModal({
   id,
   stock,
   sales,
+  sellingPrice,
   stockSelected,
   amount,
   quantity,
@@ -18,11 +19,13 @@ function EditSalesModal({
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState("");
   const [error, setError] = useState("");
+  const [profitPerUnit, setProfitPerUnit ] = useState(0);
   const [unitsLeft, setUnitsLeft] = useState(0);
   const [maxUnits, setMaxUnits] = useState(0);
   const [formData, setFormData] = useState({
     stock: stockSelected._id,
     amount: amount,
+    sellingPrice: sellingPrice,
     quantity: quantity,
     date: date,
   });
@@ -106,15 +109,20 @@ function EditSalesModal({
         setUnitsLeft(units - value);
       }
 
-      setFormData({...formData, quantity: value, amount: value * stock.filter(s => s._id === formData.stock)[0].unitPrice})
+      setFormData({...formData, quantity: value, amount: value * formData.sellingPrice})
+    }
+
+    if(name === 'sellingPrice' && value !== 0){
+      setFormData({...formData, sellingPrice: value, amount: formData.quantity * value});
+      setProfitPerUnit(value - stock.filter(s => s._id === formData.stock)[0].unitPrice);
     }
   };
 
   const handleSubmit = async (e) => {
     setLoading(true);
     e.preventDefault();
-    const { stock, amount, quantity, date } = formData;
-    if (!stock || !amount || !quantity || !date) {
+    const { stock, amount, sellingPrice, quantity, date } = formData;
+    if (!stock || !amount || !sellingPrice || !quantity || !date) {
       setErrors("Please fill all fields!");
       return;
     }
@@ -123,6 +131,7 @@ function EditSalesModal({
       stock: stock,
       amount: amount,
       quantity: quantity,
+      sellingPrice: sellingPrice,
       seller: localStorage.getItem("smartId"),
       date: date,
     };
@@ -136,6 +145,7 @@ function EditSalesModal({
           setFormData({
             stock: "",
             amount: "",
+            sellingPrice: 0,
             quantity: 0,
             date: "",
           });
@@ -203,6 +213,27 @@ function EditSalesModal({
                     </option>
                   ))}
               </select>
+            </div>
+
+             {/* selling price */}
+             <div className="relative flex flex-col w-full mt-2 md:mt-4">
+              <label
+                className="block text-start text-primary-light dark:text-accent-gray text-sm font-bold mb-2"
+                htmlFor="sellingPrice"
+              >
+                Selling Price
+              </label>
+              <input
+                className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
+                id="sellingPrice"
+                required
+                name="sellingPrice"
+                type="number"
+                value={formData.sellingPrice}
+                onChange={handleChange}
+                placeholder="How much did you sell this stock? eg.3000, 300000, etc "
+              />
+             {profitPerUnit !== 0 && (profitPerUnit > 0 ? <span className="text-xs self-start mt-1">Profit Per Unit : Tshs <span className="text-green-600 italic">{profitPerUnit}</span>/= </span> : <span className="text-xs self-start mt-1">Loss Per Unit : Tshs <span className="text-red-600 italic">{profitPerUnit}</span>/=</span>)}
             </div>
 
 

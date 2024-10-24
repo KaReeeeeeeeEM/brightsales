@@ -133,7 +133,9 @@ function StockCard({
                       .reduce((a, s) => (a += s.quantity), 0)
                   : 0) <=
               0 ? (
-              <span className="text-red-700 italic text-xs py-[2px] px-2 bg-red-100 rounded font-semibold">Out of stock</span>
+              <span className="text-red-700 italic text-xs py-[2px] px-2 bg-red-100 rounded font-semibold">
+                Out of stock
+              </span>
             ) : (
               parseInt(quantity) -
               (sales.filter((s) => s.stock !== null && s.stock._id === id)
@@ -160,6 +162,50 @@ function StockCard({
             }
           >
             {unitPrice === 0 ? "Not set" : `Tsh ${unitPrice}/=`}
+          </span>
+        </span>
+      )}
+      {type.toLowerCase().trim() !== "capital" && sales.length > 0 && (
+        <span className="text-sm flex items-center">
+          <span className="mr-2">Net Profit Per Stock: </span>
+         
+          <span className="text-[#333] dark:text-accent-gray">
+            Tsh
+            {Math.abs(sales
+              .filter((sa) => sa.stock !== null && sa.stock._id === id)
+              .reduce(
+                (a, t) => (a += (t.sellingPrice - unitPrice) * t.quantity),
+                0
+              )) > 1000000
+              ? sales
+                  .filter((sa) => sa.stock !== null && sa.stock._id === id)
+                  .reduce(
+                    (a, t) => (a += (t.sellingPrice - unitPrice) * t.quantity),
+                    0
+                  ) /
+                  1000000 +
+                "M"
+              : Math.abs(sales
+                  .filter((sa) => sa.stock !== null && sa.stock._id === id)
+                  .reduce(
+                    (a, t) => (a += (t.sellingPrice - unitPrice) * t.quantity),
+                    0
+                  )) > 1000
+              ? sales
+                  .filter((sa) => sa.stock !== null && sa.stock._id === id)
+                  .reduce(
+                    (a, t) => (a += (t.sellingPrice - unitPrice) * t.quantity),
+                    0
+                  ) /
+                  1000 +
+                "k"
+              : sales
+                  .filter((sa) => sa.stock !== null && sa.stock._id === id)
+                  .reduce(
+                    (a, t) => (a += (t.sellingPrice - unitPrice) * t.quantity),
+                    0
+                  )}
+                  /=
           </span>
         </span>
       )}

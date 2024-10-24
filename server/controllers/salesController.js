@@ -12,13 +12,14 @@ exports.getSales = async (req,res) => {
 }
 
 exports.createSales = async (req,res) => {
-    const { stock, amount, seller, quantity, date } = req.body;
-    if(!stock || !amount || !seller || !quantity || !date) return res.status(400).json({success: false, message: 'Bad request!'});
+    const { stock, amount, sellingPrice, seller, quantity, date } = req.body;
+    if(!stock || !amount || !sellingPrice || !seller || !quantity || !date) return res.status(400).json({success: false, message: 'Bad request!'});
 
     try{
         const payload = {
             stock: stock,
             amount: amount,
+            sellingPrice: sellingPrice,
             quantity: quantity,
             seller: seller,
             date: date
