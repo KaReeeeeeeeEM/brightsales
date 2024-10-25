@@ -22,7 +22,7 @@ function Categories() {
   const fetchCategories = async () => {
     setLoading(true);
     await axios
-      .get("http://localhost:10000/categories")
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/categories")
       .then((res) => {
         setLoading(false);
         setCategories(

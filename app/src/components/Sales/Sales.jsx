@@ -14,7 +14,7 @@ function Sales() {
   const fetchSales = async () => {
     setLoading(true)
     await axios
-      .get("http://localhost:10000/sales")
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/sales")
       .then((res) => {
         setLoading(false)
         setSales(
@@ -39,7 +39,7 @@ function Sales() {
   const fetchStock = async () => {
     setLoading(true)
     await axios
-      .get("http://localhost:10000/stock")
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/stock")
       .then((res) => {
         setLoading(false)
         setStock(

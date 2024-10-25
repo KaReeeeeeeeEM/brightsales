@@ -34,7 +34,7 @@ function CategoriesModal({ onClose, callback }) {
     };
 
     await axios
-      .post("http://localhost:10000/categories", finalData)
+      .post("https://oyster-app-k8jcp.ondigitalocean.app/categories", finalData)
       .then(async (res) => {
         const { success, message } = res.data;
         if (success && success === true) {
@@ -44,7 +44,7 @@ function CategoriesModal({ onClose, callback }) {
             seller: localStorage.getItem('smartId'),
             details: `Included ${finalData.name} in the categories list.`
           }
-          const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
+          const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
           if(activityUpdate.data.success === true){
                 setFormData({
                   name: "",

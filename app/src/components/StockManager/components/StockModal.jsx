@@ -40,7 +40,7 @@ function StockModal({ onClose, callback, categories }) {
     };
 
     await axios
-      .post("http://localhost:10000/stock", finalData)
+      .post("https://oyster-app-k8jcp.ondigitalocean.app/stock", finalData)
       .then(async (res) => {
         const { success, message } = res.data;
         if (success && success === true) {
@@ -50,7 +50,7 @@ function StockModal({ onClose, callback, categories }) {
             seller: localStorage.getItem('smartId'),
             details: `Added ${finalData.quantity} of ${finalData.name}`
           }
-          const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
+          const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
           if(activityUpdate.data.success === true){
                 setFormData({
                   name: "",

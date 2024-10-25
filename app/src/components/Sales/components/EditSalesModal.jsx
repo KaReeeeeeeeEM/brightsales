@@ -137,7 +137,7 @@ function EditSalesModal({
     };
 
     await axios
-      .put(`http://localhost:10000/sales/${id}`, finalData)
+      .put(`https://oyster-app-k8jcp.ondigitalocean.app/sales/${id}`, finalData)
       .then((res) => {
         const { success, message } = res.data;
         if (success && success === true) {

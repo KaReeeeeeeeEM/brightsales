@@ -19,7 +19,7 @@ function TopAppBar({ theme, toggleTheme }) {
 
   const fetchUser = async () => {  
       try{
-          const res = await axios.get(`http://localhost:10000/users/${userId}`);
+          const res = await axios.get(`https://oyster-app-k8jcp.ondigitalocean.app/users/${userId}`);
           if(res.data.success === true){
               setUser(res.data.data);
           } else{
@@ -33,7 +33,7 @@ function TopAppBar({ theme, toggleTheme }) {
 
   const deleteAccount = async () => {
     try{
-      const res = await axios.delete(`http://localhost:10000/users/${localStorage.getItem('smartId')}`);
+      const res = await axios.delete(`https://oyster-app-k8jcp.ondigitalocean.app/users/${localStorage.getItem('smartId')}`);
       if(res.data.success === true){
           localStorage.removeItem('smartId');
           localStorage.removeItem('smartUsername');
@@ -53,7 +53,7 @@ function TopAppBar({ theme, toggleTheme }) {
 
   const handleLogout = async () => {
     try{
-      const res = await axios.post('http://localhost:10000/auth/logout');
+      const res = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/auth/logout');
       if(res){
         localStorage.removeItem('smartId');
         localStorage.removeItem('smartUsername');

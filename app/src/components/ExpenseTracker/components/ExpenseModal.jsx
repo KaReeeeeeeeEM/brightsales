@@ -38,7 +38,7 @@ function ExpenseModal({ onClose, callback }) {
     };
 
     await axios
-      .post("http://localhost:10000/expenses", finalData)
+      .post("https://oyster-app-k8jcp.ondigitalocean.app/expenses", finalData)
       .then(async (res) => {
         const { success, message } = res.data;
         if (success && success === true) {
@@ -48,7 +48,7 @@ function ExpenseModal({ onClose, callback }) {
             seller: localStorage.getItem('smartId'),
             details: `Incurred Tshs ${finalData.cost}/= of ${finalData.name}`
           }
-          const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
+          const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
           if(activityUpdate.data.success === true){
                 setFormData({
                   name: "",

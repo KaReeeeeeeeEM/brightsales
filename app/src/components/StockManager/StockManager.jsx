@@ -121,7 +121,7 @@ function StockManager() {
   const fetchCategories = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:10000/categories");
+      const response = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/categories");
       const categories = response.data.data
         .filter(
           (c) => c.seller && c.seller._id === localStorage.getItem("smartId")
@@ -139,7 +139,7 @@ function StockManager() {
   const fetchStock = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:10000/stock");
+      const response = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/stock");
       const allStock = response.data.data.filter(
         (item) =>
           item.seller && item.seller._id === localStorage.getItem("smartId")
@@ -204,7 +204,7 @@ function StockManager() {
   const fetchSales = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:10000/sales");
+      const response = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/sales");
       const allSales = response.data.data.filter(
         (s) => s.seller && s.seller._id === localStorage.getItem("smartId")
       );

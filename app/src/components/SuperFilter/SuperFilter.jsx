@@ -21,10 +21,10 @@ function SuperFilter() {
 
   const fetchAllTypes = async () => {
     setLoading(true);
-    const allStock = await axios.get("http://localhost:10000/stock");
-    const allSales = await axios.get("http://localhost:10000/sales");
-    const allCategories = await axios.get("http://localhost:10000/categories");
-    const allExpenses = await axios.get("http://localhost:10000/expenses");
+    const allStock = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/stock");
+    const allSales = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/sales");
+    const allCategories = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/categories");
+    const allExpenses = await axios.get("https://oyster-app-k8jcp.ondigitalocean.app/expenses");
 
     setStock(
       allStock.data.data

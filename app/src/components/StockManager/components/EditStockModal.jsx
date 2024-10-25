@@ -57,7 +57,7 @@ function EditStockModal({
     };
 
     await axios
-      .put(`http://localhost:10000/stock/${id}`, finalData)
+      .put(`https://oyster-app-k8jcp.ondigitalocean.app/stock/${id}`, finalData)
       .then((res) => {
         const { success, message } = res.data;
         if (success && success === true) {

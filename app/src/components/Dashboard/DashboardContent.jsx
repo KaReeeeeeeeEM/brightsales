@@ -132,7 +132,7 @@ function DashboardContent() {
 
   const fetchActivities = async () => {
     await axios
-      .get("http://localhost:10000/activity")
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/activity")
       .then((res) => {
         setActivities(
           res.data.data
@@ -153,7 +153,7 @@ function DashboardContent() {
 
   const fetchStock = async () => {
     await axios
-      .get("http://localhost:10000/stock")
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/stock")
       .then((res) => {
         setAllStock(
           res.data.data.filter(
@@ -171,7 +171,7 @@ function DashboardContent() {
 
   const fetchExpenses = async () => {
     await axios
-      .get("http://localhost:10000/expenses")
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/expenses")
       .then((res) => {
         setTotalExpenses(
           res.data.data
@@ -187,7 +187,7 @@ function DashboardContent() {
 
   const fetchSales = async () => {
     await axios
-      .get("http://localhost:10000/sales")
+      .get("https://oyster-app-k8jcp.ondigitalocean.app/sales")
       .then((res) => {
         setSales(
           res.data.data.filter(

@@ -37,7 +37,7 @@ function EditExpensesModal({ onClose, callback, id, name,cost, date }) {
     };
 
     await axios
-      .put(`http://localhost:10000/expenses/${id}`, finalData)
+      .put(`https://oyster-app-k8jcp.ondigitalocean.app/expenses/${id}`, finalData)
       .then((res) => {
         const { success, message } = res.data;
         if (success && success === true) {

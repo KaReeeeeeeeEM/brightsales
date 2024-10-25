@@ -44,7 +44,7 @@ function StockCard({
 
   const deleteStock = async () => {
     await axios
-      .delete(`http://localhost:10000/stock/${id}`)
+      .delete(`https://oyster-app-k8jcp.ondigitalocean.app/stock/${id}`)
       .then(async (res) => {
         if (res.data.success === true) {
           const newActivity = {
@@ -53,7 +53,7 @@ function StockCard({
             details: `Removed ${quantity} of ${name} from the store`,
           };
           const activityUpdate = await axios.post(
-            "http://localhost:10000/activity",
+            "https://oyster-app-k8jcp.ondigitalocean.app/activity",
             newActivity
           );
           if (activityUpdate) callback();

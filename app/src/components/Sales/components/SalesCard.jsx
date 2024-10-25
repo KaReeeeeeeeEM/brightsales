@@ -30,7 +30,7 @@ function SalesCard({ id, name, sales, type, amount, sellingPrice, quantity, stoc
   };
 
   const deleteExpense = async () => {
-    await axios.delete(`http://localhost:10000/sales/${id}`)
+    await axios.delete(`https://oyster-app-k8jcp.ondigitalocean.app/sales/${id}`)
     .then(
       async res => {
         if(res.data.success === true){
@@ -39,7 +39,7 @@ function SalesCard({ id, name, sales, type, amount, sellingPrice, quantity, stoc
               seller: localStorage.getItem('smartId'),
               details: `Removed ${amount} of ${name} from the sales list`
             }
-            const activityUpdate = await axios.post('http://localhost:10000/activity', newActivity)
+            const activityUpdate = await axios.post('https://oyster-app-k8jcp.ondigitalocean.app/activity', newActivity)
             if(activityUpdate) callback();
         } else {
           console.log('Error deleting sales', res.data.message);

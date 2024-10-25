@@ -48,7 +48,7 @@ function Register() {
 
     try {
       const res = await axios.post(
-        "http://localhost:10000/auth/v2/register",
+        "https://oyster-app-k8jcp.ondigitalocean.app/auth/v2/register",
         formData
       );
       if (res.data.success === true) {
@@ -90,7 +90,7 @@ function Register() {
         password: formData.password,
       };
       const res = await axios.post(
-        "http://localhost:10000/auth/v2/login",
+        "https://oyster-app-k8jcp.ondigitalocean.app/auth/v2/login",
         loginCredentials
       );
 
