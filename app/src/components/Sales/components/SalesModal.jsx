@@ -158,7 +158,7 @@ function SalesModal({ onClose, callback, stock, sales }) {
                 className="appearance-none bg-accent-grayShade dark:bg-primary-glass border focus:border-white rounded w-full py-2 px-3 text-primary-light dark:text-accent-gray leading-tight focus:outline-none focus:ring-white"
               >
                 <option value="">What stock did you sell?</option>
-                {stock.length > 0 && stock.map(s => <option  key={s._id} value={s._id}>{s.name} ({s.type})</option>)}
+                {stock.length > 0 && stock.filter(s => (s.quantity - sales.filter(sa => sa.stock?._id === s._id).reduce((a,s) => a += s.quantity ,0)) > 0).map(s => <option  key={s._id} value={s._id}>{s.name} ({s.type})</option>)}
               </select>
             </div>
 

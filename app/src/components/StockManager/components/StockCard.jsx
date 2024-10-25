@@ -165,18 +165,49 @@ function StockCard({
           </span>
         </span>
       )}
+      {type.toLowerCase().trim() !== "capital" && (
+        <span className="text-sm flex items-center">
+          <span className="mr-2">Total Sales: </span>
+          <span className="text-[#333] dark:text-accent-gray">
+            Tsh
+            {sales
+              .filter((sa) => sa.stock?._id === id)
+              .reduce((a, s) => (a += parseInt(s.amount)), 0) > 1000000
+              ? <span className="ml-1">{sales
+                  .filter((sa) => sa.stock?._id === id)
+                  .reduce((a, s) => (a += parseInt(s.amount)), 0) /
+                  1000000 }
+                M</span>
+              : sales
+                  .filter((sa) => sa.stock?._id === id)
+                  .reduce((a, s) => (a += parseInt(s.amount)), 0) > 1000
+              ? <span className="ml-1">{sales
+                .filter((sa) => sa.stock?._id === id)
+                .reduce((a, s) => (a += parseInt(s.amount)), 0) /
+                1000 }
+              k</span>
+              : <span className="ml-1">{sales
+                .filter((sa) => sa.stock?._id === id)
+                .reduce((a, s) => (a += parseInt(s.amount)), 0) /
+                1000000 }
+              </span>}/=
+          </span>
+        </span>
+      )}
       {type.toLowerCase().trim() !== "capital" && sales.length > 0 && (
         <span className="text-sm flex items-center">
           <span className="mr-2">Net Profit Per Stock: </span>
-         
+
           <span className="text-[#333] dark:text-accent-gray">
             Tsh
-            {Math.abs(sales
-              .filter((sa) => sa.stock !== null && sa.stock._id === id)
-              .reduce(
-                (a, t) => (a += (t.sellingPrice - unitPrice) * t.quantity),
-                0
-              )) > 1000000
+            {Math.abs(
+              sales
+                .filter((sa) => sa.stock !== null && sa.stock._id === id)
+                .reduce(
+                  (a, t) => (a += (t.sellingPrice - unitPrice) * t.quantity),
+                  0
+                )
+            ) > 1000000
               ? sales
                   .filter((sa) => sa.stock !== null && sa.stock._id === id)
                   .reduce(
@@ -185,12 +216,15 @@ function StockCard({
                   ) /
                   1000000 +
                 "M"
-              : Math.abs(sales
-                  .filter((sa) => sa.stock !== null && sa.stock._id === id)
-                  .reduce(
-                    (a, t) => (a += (t.sellingPrice - unitPrice) * t.quantity),
-                    0
-                  )) > 1000
+              : Math.abs(
+                  sales
+                    .filter((sa) => sa.stock !== null && sa.stock._id === id)
+                    .reduce(
+                      (a, t) =>
+                        (a += (t.sellingPrice - unitPrice) * t.quantity),
+                      0
+                    )
+                ) > 1000
               ? sales
                   .filter((sa) => sa.stock !== null && sa.stock._id === id)
                   .reduce(
@@ -205,7 +239,7 @@ function StockCard({
                     (a, t) => (a += (t.sellingPrice - unitPrice) * t.quantity),
                     0
                   )}
-                  /=
+            /=
           </span>
         </span>
       )}
