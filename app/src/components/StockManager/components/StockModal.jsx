@@ -132,6 +132,7 @@ function StockModal({ onClose, callback, categories }) {
               >
                 <option value="">Choose category of stock</option>
                 <option value="Capital">Capital (mtaji)</option>
+                <option value="Mchele">Mchele</option>
                 {categories.map((c,i) => <option key={i} value={c}>{c}</option>)}
               </select>
             </div>
