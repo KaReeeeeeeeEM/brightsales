@@ -418,7 +418,7 @@ function SuperFilter() {
                 (st) =>
                   st.stock !== null &&
                   st.stock.name.toLowerCase().trim().includes(keyword)
-              )
+              ) 
           ).map((s) => (
             <SalesCard
               id={s._id}
